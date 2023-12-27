@@ -1,0 +1,18 @@
+# top-most EditorConfig file
+root = true
+
+# newlines
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Tạo căn lề 2 space
+[*]
+indent_style = space
+indent_size = 2
+
+# Ở các file markdown vẫn có thể thêm khoảng trắng ở cuối
+[*.md]
+trim_trailing_whitespace = false
