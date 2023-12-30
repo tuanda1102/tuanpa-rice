@@ -14,6 +14,7 @@ import {
   DropdownMenu,
   DropdownTrigger,
   Spinner,
+  useDisclosure,
   type TableProps,
 } from '@nextui-org/react';
 import { FcReuse } from 'react-icons/fc';
@@ -23,21 +24,30 @@ import {
   MdOutlineDeleteOutline,
   MdOutlineEdit,
 } from 'react-icons/md';
+import { useState } from 'react';
 
 import ModalOrder from '@/features/Order/components/Modal/ModalOrder';
 import { useOrderDetail } from '@/apis/sheets.api';
 import { useDeleteOrder } from '@/features/Order/apis/order.api';
+import { type IOrder } from '@/types/order';
 
 interface ITableOrderProps extends TableProps {}
 
 function TableOrder({ ...passProps }: ITableOrderProps) {
   const { id } = useParams<{ id: string }>();
+  const [orderEditData, setOrderEditData] = useState<IOrder | undefined>(
+    undefined,
+  );
+  const disclosureActions = useDisclosure();
   const { data, isLoading } = useOrderDetail(id as string);
   const deleteOrder = useDeleteOrder();
 
   return (
     <>
-      <ModalOrder />
+      <ModalOrder
+        disclosureActions={disclosureActions}
+        editData={orderEditData}
+      />
       <Table
         isHeaderSticky
         selectionMode='single'
@@ -46,7 +56,8 @@ function TableOrder({ ...passProps }: ITableOrderProps) {
       >
         <TableHeader>
           <TableColumn>STT</TableColumn>
-          <TableColumn>Tên</TableColumn>
+          <TableColumn>Tên người đặt</TableColumn>
+          <TableColumn>Tên món</TableColumn>
           <TableColumn>Giá</TableColumn>
           <TableColumn>Thanh toán</TableColumn>
           <TableColumn className='text-right'>Actions</TableColumn>
@@ -70,7 +81,8 @@ function TableOrder({ ...passProps }: ITableOrderProps) {
             ? data.map((orderItem, index) => (
                 <TableRow key={orderItem.id}>
                   <TableCell width={80}>{index + 1}</TableCell>
-                  <TableCell>{orderItem.name}</TableCell>
+                  <TableCell width={200}>{orderItem.name as string}</TableCell>
+                  <TableCell>{orderItem.foodName}</TableCell>
                   <TableCell width={210}>{orderItem.price}</TableCell>
                   <TableCell width={150}>
                     {orderItem.status === 'TRUE' ? (
@@ -99,8 +111,14 @@ function TableOrder({ ...passProps }: ITableOrderProps) {
                             <MdMoreVert size={18} />
                           </Button>
                         </DropdownTrigger>
-                        <DropdownMenu>
-                          <DropdownItem startContent={<MdOutlineEdit />}>
+                        <DropdownMenu aria-label='Menu actions'>
+                          <DropdownItem
+                            onPress={() => {
+                              setOrderEditData(orderItem);
+                              disclosureActions.onOpen();
+                            }}
+                            startContent={<MdOutlineEdit />}
+                          >
                             Edit
                           </DropdownItem>
                           <DropdownItem

@@ -10,7 +10,7 @@ const menuSchema: Yup.ObjectSchema<
   title: Yup.string().required('Nhập tên menu này!'),
   image: Yup.mixed<FileList>().test(
     'fileSize',
-    'Nhập ảnh bé bé thui =)))',
+    'Up ảnh bé bé thui =))), cỡ 150kb trở lại đồ đó.',
     (files) => {
       if (!files?.length) return true; // Không validate trong trường hợp không upload file
       return files[0].size <= 150000; // 150kb

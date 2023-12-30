@@ -90,6 +90,7 @@ function ModalMenu({ ...passProps }: IModalMenuProps) {
   return (
     <div>
       <Button
+        size='lg'
         onPress={onOpen}
         radius='full'
         color='primary'

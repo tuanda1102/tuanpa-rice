@@ -1,5 +1,6 @@
 import { type HTMLAttributes } from 'react';
 import { useFormContext } from 'react-hook-form';
+import { ErrorMessage } from '@/components/ErrorMessage';
 
 interface ICInputUploadFileProps extends HTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -16,7 +17,10 @@ function CInputUploadFile({
   name,
   ...passProps
 }: ICInputUploadFileProps) {
-  const { register } = useFormContext();
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext();
 
   return (
     <div className={classNameWrapper}>
@@ -52,6 +56,10 @@ function CInputUploadFile({
         >
           {description}
         </p>
+      )}
+
+      {errors[name]?.message && (
+        <ErrorMessage>{String(errors[name]?.message)}</ErrorMessage>
       )}
     </div>
   );

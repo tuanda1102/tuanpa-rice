@@ -1,12 +1,22 @@
-import { type SelectProps } from '@nextui-org/react';
+import { type Props } from 'react-select';
 
 export interface ISelectOptions {
   label: string;
   value: string;
 }
 
-export interface ICSelectProps extends Omit<SelectProps, 'children'> {
-  name: string;
+// export interface ICSelectProps extends Omit<SelectProps, 'children'> {
+//   name: string;
+//   classNameWrapper?: string;
+//   options: ISelectOptions[];
+// }
+
+export interface ICSelectProps extends Omit<Props, 'required'> {
+  label?: string;
   classNameWrapper?: string;
-  options: ISelectOptions[];
+  name: string;
+  required?: boolean;
+  options: ISelectOption[] | ISelectGroupOption[];
+  isValid?: boolean;
+  errorMessage?: string;
 }

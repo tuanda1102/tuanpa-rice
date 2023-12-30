@@ -15,6 +15,7 @@ export default {
         sidebar: '90px',
         header: '90px',
         banner: '380px',
+        input: '56px',
       },
     },
   },

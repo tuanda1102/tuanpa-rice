@@ -8,39 +8,73 @@ import {
   ModalContent,
   ModalHeader,
   type ModalProps,
-  useDisclosure,
 } from '@nextui-org/modal';
 import { useParams } from 'react-router-dom';
+import { type UseDisclosureProps } from '@nextui-org/react';
+import { type Dispatch, type SetStateAction } from 'react';
 
-import { useOrderForm } from '@/validations/order.validation';
 import CInputValidation from '@/components/Input/CInputValidation';
 import CSelectValidation from '@/components/Select/CSelectValidation';
 import { useListUser } from '@/apis/config.api';
 import { useAddOrder } from '@/features/Order/apis/order.api';
 import appToast from '@/utils/toast.util';
 import { useGetMenuById } from '@/apis/sheets.api';
+import { type IOrderSchema, type IOrder } from '@/types/order';
+import { useFormWithYupSchema } from '@/hooks/useYupValidationResolver';
+import orderSchema from '@/validations/order.validation';
+import { type ISelectOptions } from '@/types/select';
 
-interface IModalOrderProps extends Omit<ModalProps, 'children'> {}
+interface IModalOrderProps extends Omit<ModalProps, 'children'> {
+  editData?: IOrder;
+  onSetEditData?: Dispatch<SetStateAction<IOrder | undefined>>;
+  disclosureActions: UseDisclosureProps;
+}
 
-function ModalOrder({ ...passProps }: IModalOrderProps) {
-  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+const defaultValues: IOrderSchema = {
+  name: null,
+  foodName: '',
+  status: 'FALSE',
+};
+
+function ModalOrder({
+  editData,
+  onSetEditData,
+  disclosureActions,
+  ...passProps
+}: IModalOrderProps) {
   const { id } = useParams();
 
   const { data: menu } = useGetMenuById(String(id));
-  const configData = useListUser();
+  const { data: listUser } = useListUser();
   const { mutate: addOrder, isLoading: isLoadingOrder } = useAddOrder();
 
-  const methods = useOrderForm();
+  const methods = useFormWithYupSchema(orderSchema, {
+    defaultValues,
+    values: editData
+      ? {
+          ...editData,
+          name: listUser?.find((user) => user.value === editData.name) || null,
+        }
+      : undefined,
+  });
 
   const { handleSubmit, reset } = methods;
 
-  const submitHandler = handleSubmit((values) => {
+  const submitHandler = handleSubmit((values: IOrder) => {
+    const userName = values.name as ISelectOptions;
+    const statusCheckout = values.status as ISelectOptions;
+
     addOrder(
       {
-        ...values,
         id: uuidv4(),
+        name: userName.value,
         menuId: String(id),
         price: menu?.price ? String(menu?.price) : '',
+        status: statusCheckout.value,
+        foodName: values.foodName,
+        isDeleted: 'FALSE',
+        createdAt: new Date(),
+        uploadedAt: new Date(),
       },
       {
         onSuccess() {
@@ -50,8 +84,10 @@ function ModalOrder({ ...passProps }: IModalOrderProps) {
               text: 'Order thành công!',
             },
           });
-          reset({});
-          onClose();
+          reset(defaultValues);
+          if (typeof disclosureActions.onClose === 'function') {
+            disclosureActions.onClose();
+          }
         },
         onError() {
           appToast({
@@ -68,14 +104,27 @@ function ModalOrder({ ...passProps }: IModalOrderProps) {
   return (
     <div className='mb-2'>
       <div className='flex justify-end'>
-        <Button radius='full' onPress={onOpen} startContent={<IoMdAdd />}>
+        <Button
+          radius='full'
+          onPress={disclosureActions.onOpen}
+          startContent={<IoMdAdd />}
+        >
           Thêm
         </Button>
       </div>
       <Modal
+        isDismissable={false}
         size='3xl'
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
+        isOpen={disclosureActions.isOpen}
+        onOpenChange={(isOpenChange) => {
+          if (!isOpenChange) {
+            onSetEditData?.(undefined);
+          }
+        }}
+        onClose={() => {
+          disclosureActions.onClose?.();
+          reset(defaultValues);
+        }}
         {...passProps}
       >
         <ModalContent>
@@ -86,11 +135,12 @@ function ModalOrder({ ...passProps }: IModalOrderProps) {
             <FormProvider {...methods}>
               <form onSubmit={submitHandler}>
                 <CSelectValidation
-                  isRequired
+                  isClearable
+                  required
                   label='Tên người đặt'
                   name='name'
                   id='name'
-                  options={configData.data || []}
+                  options={listUser || []}
                 />
 
                 <CInputValidation
@@ -112,7 +162,7 @@ function ModalOrder({ ...passProps }: IModalOrderProps) {
                 />
 
                 <CSelectValidation
-                  isRequired
+                  required
                   label='Trạng thái thanh toán'
                   name='status'
                   id='status'
@@ -129,7 +179,7 @@ function ModalOrder({ ...passProps }: IModalOrderProps) {
                 />
 
                 <div className='flex justify-end gap-1'>
-                  <Button variant='light' onPress={onClose}>
+                  <Button variant='light' onPress={disclosureActions.onClose}>
                     Close
                   </Button>
                   <Button

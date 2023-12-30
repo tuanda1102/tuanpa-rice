@@ -1,18 +1,15 @@
 import { Controller, useFormContext } from 'react-hook-form';
-import { Select, SelectItem } from '@nextui-org/react';
 
+import { CSelect } from '@/components/Select';
 import { type ICSelectProps } from '@/types/select';
 
-function CSelectValidation({
-  name,
-  classNameWrapper = 'mb-3',
-  options = [],
-  label,
+export default function CSelectValidation({
+  name = '',
   ...passProps
 }: ICSelectProps) {
   const {
     control,
-    formState: { errors, defaultValues },
+    formState: { errors },
   } = useFormContext();
 
   return (
@@ -20,35 +17,13 @@ function CSelectValidation({
       control={control}
       name={name}
       render={({ field }) => (
-        <div className={classNameWrapper}>
-          <Select
-            autoComplete='off'
-            className='max-w-xs'
-            defaultSelectedKeys={
-              defaultValues && defaultValues[name]
-                ? [`${defaultValues[name]}`]
-                : undefined
-            }
-            aria-labelledby={String(label)}
-            aria-label={String(label)}
-            label={label}
-            errorMessage={
-              errors[name]?.message ? String(errors[name]?.message) : ''
-            }
-            isInvalid={!!errors[name]?.message}
-            {...field}
-            {...passProps}
-          >
-            {options.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </Select>
-        </div>
+        <CSelect
+          errorMessage={errors[name]?.message as string}
+          isValid={!!errors[name]?.message}
+          {...field}
+          {...passProps}
+        />
       )}
     />
   );
 }
-
-export default CSelectValidation;

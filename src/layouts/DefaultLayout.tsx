@@ -14,7 +14,7 @@ function DefaultLayout({ children }: IDefaultLayoutProps) {
         <Sidebar />
         <div className='sm:ml-sidebar sm:mr-banner px-6'>
           <Header />
-          <Card className='mb-10 h-[calc(100vh_-_0.75rem_-_theme(spacing.header))] rounded-[36px] p-4'>
+          <Card className='mb-10 h-[calc(100vh_-_1.5rem_-_theme(spacing.header))] rounded-[36px] p-4'>
             <CardHeader className='italic text-primary font-semibold'>
               Thà rằng ăn bát cơm rau, còn hơn thịt cá nói nhau nặng lời !
             </CardHeader>

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { type UseQueryResult, useQuery } from '@tanstack/react-query';
 
 import http from '@/config/axios.config';
 import { type ISelectOptions } from '@/types/select';
@@ -12,8 +12,8 @@ const getConfigDBApi = async () => {
   return res.data;
 };
 
-export const useDBConfig = (
-  select?: ((data: IConfigDbRes[]) => void) | undefined,
+export const useDBConfig = <T = any>(
+  select?: ((data: IConfigDbRes[]) => T | UseQueryResult<T>) | undefined,
 ) => {
   return useQuery({
     queryKey: ['get-db-config'],
@@ -23,10 +23,10 @@ export const useDBConfig = (
 };
 
 export const useListUser = () => {
-  return useDBConfig((data) => {
+  return useDBConfig<ISelectOptions[]>((data) => {
     return data.map((user) => ({
       label: user.listUser,
       value: user.listUser,
-    })) as unknown as ISelectOptions[];
-  });
+    }));
+  }) as unknown as UseQueryResult<ISelectOptions[]>;
 };
