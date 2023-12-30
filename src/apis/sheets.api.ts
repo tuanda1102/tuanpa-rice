@@ -60,7 +60,7 @@ const getMenu = async () => {
   return res.data;
 };
 
-export const useGetMenu = <T = any>(
+export const useMenu = <T = IMenu[]>(
   select?: ((data: IMenu[]) => T | UseQueryResult<T>) | undefined,
 ) => {
   return useQuery({
@@ -72,11 +72,15 @@ export const useGetMenu = <T = any>(
   });
 };
 
+export const useGetMenu = () => {
+  return useMenu<IMenu[]>((data) => data) as unknown as UseQueryResult<IMenu[]>;
+};
+
 /**
  * Lấy 1 menu theo ID
  */
 export const useGetMenuById = (menuId: string) => {
-  return useGetMenu<IMenu | undefined>((data) =>
+  return useMenu<IMenu | undefined>((data) =>
     data.find((menuItem) => menuItem.id === menuId),
   ) as unknown as UseQueryResult<IMenu>;
 };
