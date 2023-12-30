@@ -14,7 +14,7 @@ export default defineConfig({
   resolve: {
     alias: [{ find: '@', replacement: path.resolve(__dirname, 'src') }],
   },
-  envPrefix: 'TUANPA_RICE_',
+  envPrefix: 'VERCEL',
   server: {
     host: true,
     watch: {
