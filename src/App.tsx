@@ -1,11 +1,7 @@
-import { Button } from '@nextui-org/button';
+import AppRouter from '@/providers/AppRouter';
 
 function App() {
-  return (
-    <div className='text-rose-500'>
-      <Button>hihi</Button>
-    </div>
-  );
+  return <AppRouter />;
 }
 
 export default App;
