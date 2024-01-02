@@ -28,7 +28,7 @@ function Sidebar() {
               </Button>
             </Tooltip>
           </li>
-          <li>
+          {/* <li>
             <Button isIconOnly>
               <IoMdAdd />
             </Button>
@@ -47,7 +47,7 @@ function Sidebar() {
             <Button isIconOnly>
               <IoMdAdd />
             </Button>
-          </li>
+          </li> */}
         </ul>
       </div>
     </aside>
