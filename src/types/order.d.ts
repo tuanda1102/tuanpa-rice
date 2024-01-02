@@ -9,7 +9,7 @@ export interface IOrder {
   menuId: string;
   isDeleted?: 'TRUE' | 'FALSE';
   createdAt?: Date | string;
-  uploadedAt?: Date | string;
+  updatedAt?: Date | string;
 }
 
 export interface IMenu {

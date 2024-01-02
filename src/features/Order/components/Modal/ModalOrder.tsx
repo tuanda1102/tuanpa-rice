@@ -16,7 +16,7 @@ import { type Dispatch, type SetStateAction } from 'react';
 import CInputValidation from '@/components/Input/CInputValidation';
 import CSelectValidation from '@/components/Select/CSelectValidation';
 import { useListUser } from '@/apis/config.api';
-import { useAddOrder } from '@/features/Order/apis/order.api';
+import { useAddOrder, useEditOrder } from '@/features/Order/apis/order.api';
 import appToast from '@/utils/toast.util';
 import { useGetMenuById } from '@/apis/sheets.api';
 import { type IOrderSchema, type IOrder } from '@/types/order';
@@ -47,6 +47,7 @@ function ModalOrder({
   const { data: menu } = useGetMenuById(String(id));
   const { data: listUser } = useListUser();
   const { mutate: addOrder, isLoading: isLoadingOrder } = useAddOrder();
+  const { mutate: editOrder, isLoading: isLoadingEdit } = useEditOrder();
 
   const methods = useFormWithYupSchema(orderSchema, {
     defaultValues,
@@ -64,41 +65,78 @@ function ModalOrder({
     const userName = values.name as ISelectOptions;
     const statusCheckout = values.status as ISelectOptions;
 
-    addOrder(
-      {
-        id: uuidv4(),
-        name: userName.value,
-        menuId: String(id),
-        price: menu?.price ? String(menu?.price) : '',
-        status: statusCheckout.value,
-        foodName: values.foodName,
-        isDeleted: 'FALSE',
-        createdAt: new Date(),
-        uploadedAt: new Date(),
-      },
-      {
-        onSuccess() {
-          appToast({
-            type: 'success',
-            props: {
-              text: 'Order thành công!',
-            },
-          });
-          reset(defaultValues);
-          if (typeof disclosureActions.onClose === 'function') {
-            disclosureActions.onClose();
-          }
+    if (editData) {
+      editOrder(
+        {
+          id: editData.id,
+          name: userName.value,
+          menuId: String(id),
+          price: menu?.price ? String(menu?.price) : '',
+          status: statusCheckout.value,
+          foodName: values.foodName,
+          isDeleted: 'FALSE',
+          updatedAt: new Date(),
         },
-        onError() {
-          appToast({
-            type: 'error',
-            props: {
-              text: 'Order thất bại, thử lại dùm nhóa!',
-            },
-          });
+        {
+          onSuccess() {
+            appToast({
+              type: 'success',
+              props: {
+                text: 'Cập nhật thành công!',
+              },
+            });
+            reset(defaultValues);
+            if (typeof disclosureActions.onClose === 'function') {
+              disclosureActions.onClose();
+            }
+          },
+          onError() {
+            appToast({
+              type: 'error',
+              props: {
+                text: 'Cập nhật thất bại, thử lại dùm nhóa!',
+              },
+            });
+          },
         },
-      },
-    );
+      );
+    } else {
+      addOrder(
+        {
+          id: uuidv4(),
+          name: userName.value,
+          menuId: String(id),
+          price: menu?.price ? String(menu?.price) : '',
+          status: statusCheckout.value,
+          foodName: values.foodName,
+          isDeleted: 'FALSE',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          onSuccess() {
+            appToast({
+              type: 'success',
+              props: {
+                text: 'Order thành công!',
+              },
+            });
+            reset(defaultValues);
+            if (typeof disclosureActions.onClose === 'function') {
+              disclosureActions.onClose();
+            }
+          },
+          onError() {
+            appToast({
+              type: 'error',
+              props: {
+                text: 'Order thất bại, thử lại dùm nhóa!',
+              },
+            });
+          },
+        },
+      );
+    }
   });
 
   return (
@@ -183,8 +221,8 @@ function ModalOrder({
                     Close
                   </Button>
                   <Button
-                    isLoading={isLoadingOrder}
-                    disabled={isLoadingOrder}
+                    isLoading={isLoadingOrder || isLoadingEdit}
+                    disabled={isLoadingOrder || isLoadingEdit}
                     type='submit'
                     color='primary'
                     startContent={<IoMdAdd />}

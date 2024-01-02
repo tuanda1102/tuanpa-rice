@@ -40,3 +40,22 @@ export const useDeleteOrder = () => {
     },
   });
 };
+
+/**
+ * Edit đơn
+ */
+const editOrderById = async ({ id, ...order }: IOrder) => {
+  const res = await http.patch(`/id/${id}`, order);
+  return res.data;
+};
+
+export const useEditOrder = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: editOrderById,
+    onSuccess() {
+      queryClient.invalidateQueries(['get-data-google-sheets']);
+    },
+  });
+};
