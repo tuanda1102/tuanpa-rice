@@ -9,7 +9,6 @@
 // };
 
 const APP_ENV = {
-  baseUrl: 'https://sheet.best/api/sheets/d2fcb7b8-656c-4e66-a9ae-6e3c4a296246',
   cloudinary: {
     name: 'dkxijt5p0',
     apiKey: '752713386867686',

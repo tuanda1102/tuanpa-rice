@@ -1,8 +1,6 @@
 import axios, { type InternalAxiosRequestConfig } from 'axios';
-import APP_ENV from '@/config/appEnv.config';
 
 const http = axios.create({
-  baseURL: APP_ENV.baseUrl,
   headers: {
     'Content-Type': 'application/json',
     // 'X-Api-Key':
