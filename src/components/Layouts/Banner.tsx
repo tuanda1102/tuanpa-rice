@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom';
 import { Card, CardBody, Tab, Tabs } from '@nextui-org/react';
 
 import ModalQRCode from '@/components/Modal/ModalQRCode';
-import { useGetMenuById } from '@/apis/sheets.api';
+import { useGetMenuById } from '@/apis/order.api';
 
 function Banner() {
   const { id } = useParams<{ id: string }>();

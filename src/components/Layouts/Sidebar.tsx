@@ -11,7 +11,7 @@ function Sidebar() {
       className='fixed top-0 left-0 z-40 w-sidebar h-screen transition-transform -translate-x-full sm:translate-x-0'
       aria-label='Sidebar'
     >
-      <div className='h-full px-3 py-4 flex flex-col items-center overflow-y-auto bg-gray-50'>
+      <div className='h-full px-3 py-4 flex flex-col items-center overflow-y-auto'>
         <Link to='/'>
           <Image
             className='mb-10'

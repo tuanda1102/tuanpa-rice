@@ -2,11 +2,7 @@ import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 
-import { type IMenu } from '@/types/order';
-
-const menuSchema: Yup.ObjectSchema<
-  Omit<IMenu, 'id' | 'createdAt' | 'uploadedAt' | 'isDeleted'>
-> = Yup.object().shape({
+const menuSchema = Yup.object().shape({
   title: Yup.string().required('Nhập tên menu này!'),
   image: Yup.mixed<FileList>().test(
     'fileSize',
@@ -21,7 +17,7 @@ const menuSchema: Yup.ObjectSchema<
 });
 
 export const useMenuForm = () => {
-  return useForm<Omit<IMenu, 'id'>>({
+  return useForm({
     defaultValues: {
       image: undefined,
       title: '',

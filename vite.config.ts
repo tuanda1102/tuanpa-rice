@@ -21,6 +21,9 @@ export default defineConfig({
       usePolling: true,
     },
   },
+  optimizeDeps: {
+    exclude: ['firebase_firestore.js'],
+  },
   build: {
     chunkSizeWarningLimit: 1600,
     rollupOptions: {

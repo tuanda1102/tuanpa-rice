@@ -2,7 +2,7 @@ import { Spinner } from '@nextui-org/react';
 
 function LoadingCenterLayout() {
   return (
-    <div className='fixed inset-0 grid items-center'>
+    <div className='w-full h-full flex justify-center items-center'>
       <Spinner />
     </div>
   );

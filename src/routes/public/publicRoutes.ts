@@ -1,7 +1,6 @@
 import { type IRoute } from '@/types/routes';
-import homeRoutes from '@/features/Home/routes/home.routes';
-import orderRoutes from '@/features/Order/routes/order.route';
+import authenticationRoutes from '@/features/Authentication/routes/authentication.route';
 
-const publicRoutes: IRoute[] = [...homeRoutes, ...orderRoutes];
+const publicRoutes: IRoute[] = [...authenticationRoutes];
 
 export default publicRoutes;

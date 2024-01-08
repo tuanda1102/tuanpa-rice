@@ -1,9 +1,12 @@
 import { NextUIProvider, type NextUIProviderProps } from '@nextui-org/react';
+import { ThemeProvider as NextThemesProvider } from 'next-themes';
 
 function GlobalStylesProvider({ children, ...passProps }: NextUIProviderProps) {
   return (
     <NextUIProvider {...passProps}>
-      <main className='text-foreground bg-background'>{children}</main>
+      <NextThemesProvider attribute='class' defaultTheme='dark'>
+        {children}
+      </NextThemesProvider>
     </NextUIProvider>
   );
 }
