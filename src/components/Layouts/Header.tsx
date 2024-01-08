@@ -15,6 +15,7 @@ import { useFetchUser } from '@/apis/user.api';
 import { PUBLIC_URL } from '@/constants/routerUrl';
 import { removeLocalStorageByKey } from '@/utils/localStorage.util';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher/ThemeSwitcher';
+import ModalQRCode from '@/components/Modal/ModalQRCode';
 
 function Header() {
   const navigate = useNavigate();
@@ -28,8 +29,9 @@ function Header() {
   };
 
   return (
-    <header className='h-header flex items-center'>
-      <div className='w-full flex gap-2 justify-end items-center'>
+    <header className='h-header flex gap-2 items-center justify-between'>
+      <ModalQRCode />
+      <div className='flex gap-2 justify-end items-center'>
         <Button
           size='lg'
           radius='full'
@@ -37,7 +39,7 @@ function Header() {
           className='text-white'
           startContent={<FcDonate />}
         >
-          Mời TuanPA ly cà phê
+          Góp tiền nuôi Xoăn cùng TuanPA
         </Button>
 
         <ThemeSwitcher />

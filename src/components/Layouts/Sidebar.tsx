@@ -20,7 +20,7 @@ function Sidebar() {
             src='https://scontent.fdad1-4.fna.fbcdn.net/v/t1.6435-9/129351049_2943481109206930_5974791713550558502_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=dd63ad&_nc_ohc=M8VZemg_yFMAX9uoZ8e&_nc_ht=scontent.fdad1-4.fna&oh=00_AfDCb849-N7znv7AQHu1QwGCc5eAKkx9EITZrtHo7CbN7w&oe=65B5FF54'
           />
         </Link>
-        <ul className='space-y-2 flex flex-col items-center gap-4'>
+        <ul className='space-y-2 h-full flex flex-col items-center gap-4'>
           <li>
             <Tooltip content='Order'>
               <Button color='primary' isIconOnly>
@@ -28,27 +28,8 @@ function Sidebar() {
               </Button>
             </Tooltip>
           </li>
-          {/* <li>
-            <Button isIconOnly>
-              <IoMdAdd />
-            </Button>
-          </li>
-          <li>
-            <Button isIconOnly>
-              <IoMdAdd />
-            </Button>
-          </li>
-          <li>
-            <Button isIconOnly>
-              <IoMdAdd />
-            </Button>
-          </li>
-          <li>
-            <Button isIconOnly>
-              <IoMdAdd />
-            </Button>
-          </li> */}
         </ul>
+        <span className='text-secondary'>v2.0.0</span>
       </div>
     </aside>
   );

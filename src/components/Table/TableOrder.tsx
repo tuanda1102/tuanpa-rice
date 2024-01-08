@@ -140,7 +140,7 @@ function TableOrder({ ...passProps }: TableProps) {
             !isLoading ? (
               <div className='flex flex-col items-center'>
                 <FcReuse size={80} />
-                Chưa cóa ai đặt cả =)))))
+                Chưa có ai đặt cả =))))
               </div>
             ) : (
               ''
