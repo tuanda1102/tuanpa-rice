@@ -5,6 +5,9 @@ import {
   collection,
   doc,
   deleteDoc,
+  updateDoc,
+  query,
+  orderBy,
 } from 'firebase/firestore';
 
 import { MenuCollectionRef } from '@/constants/firebaseCollections.constant';
@@ -35,8 +38,14 @@ export const useAddMenu = () => {
  * Lấy menu
  */
 const getMenu = async () => {
-  const menu = await getDocs(MenuCollectionRef);
-  return menu.docs.map((elem) => ({ ...elem.data(), id: elem.id })) as IMenu[];
+  const menu = await getDocs(
+    query(MenuCollectionRef, orderBy('createdAt', 'desc')),
+  );
+  const menuList = menu.docs.map((elem) => ({
+    ...elem.data(),
+    id: elem.id,
+  })) as IMenu[];
+  return menuList;
 };
 
 export const useMenu = () => {
@@ -46,6 +55,50 @@ export const useMenu = () => {
   });
 
   return { menuList, ...queryOptions };
+};
+
+/**
+ * Khóa menu
+ */
+
+interface IBlockMenu {
+  menuId: string;
+  body: Partial<IMenu>;
+}
+
+const blockMenu = async (data: IBlockMenu) => {
+  const menuRef = doc(firebaseDB, 'menu', data.menuId);
+  const res = await updateDoc(menuRef, data.body);
+  return res;
+};
+
+export const useBlockMenu = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: blockMenu,
+    onSuccess() {
+      queryClient.invalidateQueries(['get-menu']);
+    },
+  });
+};
+/**
+ * Xóa menu
+ */
+
+interface IDeleteMenu {
+  menuId: string;
+}
+
+const deleteMenu = async (data: IDeleteMenu) => {
+  const res = await deleteDoc(doc(MenuCollectionRef, data.menuId));
+  return res;
+};
+
+export const useDeleteMenu = () => {
+  return useMutation({
+    mutationFn: deleteMenu,
+  });
 };
 
 /**
@@ -74,7 +127,9 @@ export const useAddOrder = () => {
  */
 const getOrderedListById = async (menuId: string) => {
   const orderedRef = collection(firebaseDB, 'menu', menuId, 'ordered');
-  const menuDetail = await getDocs(orderedRef);
+  const menuDetail = await getDocs(
+    query(orderedRef, orderBy('createdAt', 'asc')),
+  );
   return menuDetail.docs.map((elem) => ({
     ...elem.data(),
     id: elem.id,
