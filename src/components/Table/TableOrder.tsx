@@ -72,7 +72,12 @@ function TableOrder({ ...passProps }: TableProps) {
       status: valueOrderEdit?.status,
     },
   });
-  const { control, handleSubmit, reset } = methods;
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isDirty },
+  } = methods;
 
   const handleEditOder = (ordered: IOrder) => {
     setIsModalEdit(true);
@@ -211,7 +216,7 @@ function TableOrder({ ...passProps }: TableProps) {
 
                 <Button
                   isLoading={isLoadingUpdateOrder}
-                  disabled={isLoadingUpdateOrder}
+                  disabled={!isDirty}
                   type='submit'
                   className='!h-input min-w-[120px]'
                 >
