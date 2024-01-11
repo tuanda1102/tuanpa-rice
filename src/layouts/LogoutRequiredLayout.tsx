@@ -17,7 +17,7 @@ function LogoutRequiredLayout({
 
   if (authUser?.email) {
     if (location.pathname === pathname) {
-      return <Navigate to={PRIVATE_URL.home} replace />;
+      return <Navigate to={PRIVATE_URL.newFeeds} replace />;
     }
     return <Navigate to={pathname} replace />;
   }
