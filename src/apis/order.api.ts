@@ -32,7 +32,7 @@ export const useAddMenu = () => {
   });
 };
 
-const updateUser = async (
+const updateOder = async (
   menuId: string,
   idUser: string,
   data: Partial<IOrder>,
@@ -48,7 +48,7 @@ export const useUpdateOder = () => {
     void,
     unknown,
     { menuId: string; idUser: string; data: Partial<IOrder> }
-  >(({ menuId, idUser, data }) => updateUser(menuId, idUser, data), {
+  >(({ menuId, idUser, data }) => updateOder(menuId, idUser, data), {
     onSuccess: () => {
       queryClient.invalidateQueries(['get-menu']);
     },
