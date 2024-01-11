@@ -4,7 +4,10 @@ import { type IMenu } from '@/types/menu';
 import MenuItemActions from './MenuItemActions';
 
 interface IMenuItemContentProps
-  extends Pick<IMenu, 'title' | 'createdByUser' | 'menuLink' | 'id'> {
+  extends Pick<
+    IMenu,
+    'title' | 'createdByUser' | 'menuLink' | 'id' | 'isBlocked'
+  > {
   isContentOnly: boolean;
 }
 
@@ -14,10 +17,17 @@ function MenuItemContent({
   menuLink,
   id,
   createdByUser,
+  isBlocked,
 }: IMenuItemContentProps) {
   return (
     <div className='w-full'>
-      {!isContentOnly && <MenuItemActions id={id} />}
+      {!isContentOnly && (
+        <MenuItemActions
+          isBlocked={isBlocked}
+          id={id}
+          createdByUser={createdByUser}
+        />
+      )}
       <p className='text-small italic'>
         {!isContentOnly && (
           <span className='font-semibold me-2'>{createdByUser}</span>
@@ -36,7 +46,13 @@ function MenuItemContent({
       ) : (
         ''
       )}
-      {isContentOnly && <MenuItemActions id={id} />}
+      {isContentOnly && (
+        <MenuItemActions
+          isBlocked={isBlocked}
+          id={id}
+          createdByUser={createdByUser}
+        />
+      )}
     </div>
   );
 }

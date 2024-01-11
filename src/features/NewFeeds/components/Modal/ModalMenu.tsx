@@ -34,30 +34,29 @@ function ModalMenu({ ...passProps }: IModalMenuProps) {
   const { handleSubmit, reset } = methods;
 
   const handleAddMenu = (values: Partial<IMenu>) => {
-    addMenu.mutate(
-      {
-        title: values.title,
-        image: values.image,
-        price: values.price || null,
-        menuLink: values.menuLink || null,
-        isDeleted: false,
-        avatarThumbnail: (authUser?.picture as string) || null,
-        createdByUser: authUser?.email as string,
-        createdAt: new Date(),
+    const data = {
+      title: values.title,
+      image: values.image,
+      price: values.price || null,
+      menuLink: values.menuLink || null,
+      isBlocked: false,
+      isDeleted: false,
+      avatarThumbnail: (authUser?.picture as string) || null,
+      createdByUser: authUser?.email as string,
+      createdAt: new Date(),
+    };
+    addMenu.mutate(data, {
+      onSuccess() {
+        appToast({
+          type: 'success',
+          props: {
+            text: 'Thêm menu thành công nà =))))',
+          },
+        });
+        onClose();
+        reset({});
       },
-      {
-        onSuccess() {
-          appToast({
-            type: 'success',
-            props: {
-              text: 'Thêm menu thành công nà =))))',
-            },
-          });
-          onClose();
-          reset({});
-        },
-      },
-    );
+    });
   };
 
   const submitHandler = handleSubmit(async (values) => {

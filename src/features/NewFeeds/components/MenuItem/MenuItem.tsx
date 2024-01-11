@@ -15,6 +15,7 @@ function MenuItem({ menu }: { menu: IMenu }) {
       {menu.image ? <Image className='rounded' src={menu.image} /> : ''}
 
       <MenuItemContent
+        isBlocked={menu.isBlocked}
         id={menu.id}
         isContentOnly={!menu.image}
         createdByUser={menu.createdByUser}

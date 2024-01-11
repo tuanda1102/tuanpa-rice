@@ -6,6 +6,7 @@ export interface IMenu {
   image: string | null;
   menuLink: string | null;
   isDeleted: boolean;
+  isBlocked: boolean;
   createdByUser: string;
   avatarThumbnail: string | null;
   createdAt: Date;
