@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
+  updateDoc,
   addDoc,
   getDocs,
   collection,
@@ -31,6 +32,28 @@ export const useAddMenu = () => {
   });
 };
 
+const updateUser = async (
+  menuId: string,
+  idUser: string,
+  data: Partial<IOrder>,
+) => {
+  const userDoc = doc(firebaseDB, 'menu', menuId, 'ordered', idUser);
+  const res = await updateDoc(userDoc, data);
+  return res;
+};
+
+export const useUpdateOder = () => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    void,
+    unknown,
+    { menuId: string; idUser: string; data: Partial<IOrder> }
+  >(({ menuId, idUser, data }) => updateUser(menuId, idUser, data), {
+    onSuccess: () => {
+      queryClient.invalidateQueries(['get-menu']);
+    },
+  });
+};
 /**
  * Lấy menu
  */
