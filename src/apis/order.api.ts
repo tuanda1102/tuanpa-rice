@@ -11,7 +11,7 @@ import {
 import { MenuCollectionRef } from '@/constants/firebaseCollections.constant';
 import { type IMenu } from '@/types/menu';
 import { firebaseDB } from '@/config/firebase.config';
-import { type IOrder } from '@/types/order';
+import { type IOrder, type IUpdateOrder } from '@/types/order';
 
 /**
  * Thêm menu
@@ -32,23 +32,16 @@ export const useAddMenu = () => {
   });
 };
 
-const updateOrder = async (
-  menuId: string,
-  idUser: string,
-  data: Partial<IOrder>,
-) => {
-  const userDoc = doc(firebaseDB, 'menu', menuId, 'ordered', idUser);
-  const res = await updateDoc(userDoc, data);
+const updateOrder = async (data: IUpdateOrder) => {
+  const userDoc = doc(firebaseDB, 'menu', data.menuId, 'ordered', data.idUser);
+  const res = await updateDoc(userDoc, data.body);
   return res;
 };
 
 export const useUpdateOrder = () => {
   const queryClient = useQueryClient();
-  return useMutation<
-    void,
-    unknown,
-    { menuId: string; idUser: string; data: Partial<IOrder> }
-  >(({ menuId, idUser, data }) => updateOrder(menuId, idUser, data), {
+  return useMutation({
+    mutationFn: updateOrder,
     onSuccess: () => {
       queryClient.invalidateQueries(['get-menu']);
     },

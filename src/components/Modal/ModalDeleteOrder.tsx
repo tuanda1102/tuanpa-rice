@@ -13,15 +13,20 @@ import { useDeleteOrderById } from '@/apis/order.api';
 import appToast from '@/utils/toast.util';
 import { type IOrder } from '@/types/order';
 
+interface IModalEditOrder extends CardProps {
+  isOpen: boolean;
+  orderUserDelete?: IOrder;
+  shadow?: 'sm' | 'md' | 'lg' | undefined;
+  onClose: () => void;
+}
+
 function ModalEditOrder({
   isOpen,
   orderUserDelete,
-  handleClose,
-}: {
-  isOpen: boolean;
-  orderUserDelete?: IOrder;
-  handleClose: () => void;
-}) {
+  shadow,
+  onClose,
+  ...passProps
+}: IModalEditOrder) {
   const queryClient = useQueryClient();
   const { menuId } = useSearchParamsCustom<Partial<INewFeedsSearchParams>>();
   const deleteOrderMutation = useDeleteOrderById();
@@ -56,12 +61,7 @@ function ModalEditOrder({
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={() => {
-        handleClose();
-      }}
-    >
+    <Modal shadow={shadow} isOpen={isOpen} onClose={onClose} {...passProps}>
       <ModalContent>
         <ModalHeader>
           Bạn có chắc chắn muốn đơn

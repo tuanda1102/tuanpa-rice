@@ -21,7 +21,7 @@ import useSearchParamsCustom from '@/hooks/useSearchParamsCustom';
 import { type INewFeedsSearchParams } from '@/features/NewFeeds/types/newFeeds';
 import { useGetOrderedListById } from '@/apis/order.api';
 import { type IOrder } from '@/types/order';
-import ModalEditOrder from '@/components/Modal/ModalEditOrder';
+import ModalEditOrder from '@/components/Modal/ModalEditOder';
 import ModalDeleteOrder from '@/components/Modal/ModalDeleteOrder';
 
 function TableOrder({ ...passProps }: TableProps) {
@@ -141,16 +141,14 @@ function TableOrder({ ...passProps }: TableProps) {
       <ModalEditOrder
         isOpen={isModalEdit}
         editOrderUser={valueOrderEdit}
-        handleClose={() => {
-          setIsModalEdit(false);
-        }}
+        shadow='sm'
+        onClose={() => setIsModalEdit(false)}
       />
       <ModalDeleteOrder
         isOpen={isModalDelete}
         orderUserDelete={orderDelete}
-        handleClose={() => {
-          setIsModalDelete(false);
-        }}
+        shadow='sm'
+        onClose={() => setIsModalDelete(false)}
       />
     </>
   );
