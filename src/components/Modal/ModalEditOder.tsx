@@ -1,6 +1,6 @@
 import {
   Modal,
-  type CardProps,
+  type ModalProps,
   ModalBody,
   ModalContent,
 } from '@nextui-org/react';
@@ -8,11 +8,9 @@ import {
 import { type IOrder } from '@/types/order';
 import FormOrder from '@/features/NewFeeds/components/Form/FormOrder';
 
-interface IModalEditOrder extends CardProps {
+interface IModalEditOrder extends Partial<ModalProps> {
   isOpen: boolean;
   editOrderUser?: IOrder;
-  shadow?: 'sm' | 'md' | 'lg' | undefined;
-  onClose: () => void;
 }
 
 function ModalEditOrder({
@@ -26,7 +24,10 @@ function ModalEditOrder({
     <Modal shadow={shadow} isOpen={isOpen} onClose={onClose} {...passProps}>
       <ModalContent className='p-4 bg-white dark:bg-default-100/50 max-w-[900px]'>
         <ModalBody>
-          <FormOrder editOrderUser={editOrderUser} onClose={onClose} />
+          <FormOrder
+            editOrderUser={editOrderUser}
+            onClose={onClose ? () => onClose() : undefined}
+          />
         </ModalBody>
       </ModalContent>
     </Modal>

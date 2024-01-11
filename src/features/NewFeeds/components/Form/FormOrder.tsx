@@ -26,7 +26,7 @@ interface IFormOrderProps extends CardProps {}
 
 interface IFormAddOrder extends IFormOrderProps {
   editOrderUser?: IOrder;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 const defaultValues = {
@@ -64,7 +64,7 @@ function FormOrder({
 
   const submitHandler = handleSubmit((values) => {
     const idUser = editOrderUser?.id;
-    if (idUser && menuId) {
+    if (idUser && menuId && onClose) {
       updateOrder(
         {
           idUser,

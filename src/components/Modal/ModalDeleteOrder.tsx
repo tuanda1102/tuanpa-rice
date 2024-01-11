@@ -4,6 +4,7 @@ import {
   Button,
   ModalContent,
   ModalHeader,
+  type ModalProps,
 } from '@nextui-org/react';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -13,11 +14,9 @@ import { useDeleteOrderById } from '@/apis/order.api';
 import appToast from '@/utils/toast.util';
 import { type IOrder } from '@/types/order';
 
-interface IModalEditOrder extends CardProps {
+interface IModalEditOrder extends Partial<ModalProps> {
   isOpen: boolean;
   orderUserDelete?: IOrder;
-  shadow?: 'sm' | 'md' | 'lg' | undefined;
-  onClose: () => void;
 }
 
 function ModalEditOrder({
@@ -72,7 +71,6 @@ function ModalEditOrder({
         </ModalHeader>
         <ModalBody>
           <div className='flex items-center justify-end gap-2'>
-            <Button onClick={() => handleClose()}>Hủy</Button>
             <Button
               isLoading={deleteOrderMutation.isLoading}
               disabled={deleteOrderMutation.isLoading}
