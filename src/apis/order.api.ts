@@ -32,7 +32,7 @@ export const useAddMenu = () => {
   });
 };
 
-const updateOder = async (
+const updateOrder = async (
   menuId: string,
   idUser: string,
   data: Partial<IOrder>,
@@ -42,13 +42,13 @@ const updateOder = async (
   return res;
 };
 
-export const useUpdateOder = () => {
+export const useUpdateOrder = () => {
   const queryClient = useQueryClient();
   return useMutation<
     void,
     unknown,
     { menuId: string; idUser: string; data: Partial<IOrder> }
-  >(({ menuId, idUser, data }) => updateOder(menuId, idUser, data), {
+  >(({ menuId, idUser, data }) => updateOrder(menuId, idUser, data), {
     onSuccess: () => {
       queryClient.invalidateQueries(['get-menu']);
     },

@@ -21,8 +21,8 @@ import useSearchParamsCustom from '@/hooks/useSearchParamsCustom';
 import { type INewFeedsSearchParams } from '@/features/NewFeeds/types/newFeeds';
 import { useGetOrderedListById } from '@/apis/order.api';
 import { type IOrder } from '@/types/order';
-import ModalEditOder from '@/components/Modal/ModalEditOder';
-import ModalDeleteOder from '@/components/Modal/ModalDeleteOder';
+import ModalEditOrder from '@/components/Modal/ModalEditOrder';
+import ModalDeleteOrder from '@/components/Modal/ModalDeleteOrder';
 
 function TableOrder({ ...passProps }: TableProps) {
   const [orderDelete, setOrderDelete] = useState<IOrder | undefined>(undefined);
@@ -35,11 +35,11 @@ function TableOrder({ ...passProps }: TableProps) {
   const { menuId } = useSearchParamsCustom<Partial<INewFeedsSearchParams>>();
   const { orderedList, isLoading } = useGetOrderedListById(menuId as string);
 
-  const handleEditOder = (ordered: IOrder) => {
+  const handleEditOrder = (ordered: IOrder) => {
     setIsModalEdit(true);
     setValueOderEdit(ordered);
   };
-  const handleDeleteOder = (ordered: IOrder) => {
+  const handleDeleteOrder = (ordered: IOrder) => {
     setOrderDelete(ordered);
     setIsModalDelete(true);
   };
@@ -116,7 +116,7 @@ function TableOrder({ ...passProps }: TableProps) {
                   </TableCell>
                   <TableCell className='text-end '>
                     <Button
-                      onClick={() => handleEditOder(ordered)}
+                      onClick={() => handleEditOrder(ordered)}
                       isIconOnly
                       className='mr-2'
                     >
@@ -124,7 +124,7 @@ function TableOrder({ ...passProps }: TableProps) {
                     </Button>
                     <Button
                       onClick={() => {
-                        handleDeleteOder(ordered);
+                        handleDeleteOrder(ordered);
                       }}
                       isIconOnly
                       color='danger'
@@ -138,16 +138,16 @@ function TableOrder({ ...passProps }: TableProps) {
             : []}
         </TableBody>
       </Table>
-      <ModalEditOder
+      <ModalEditOrder
         isOpen={isModalEdit}
-        editOderUser={valueOrderEdit}
+        editOrderUser={valueOrderEdit}
         handleClose={() => {
           setIsModalEdit(false);
         }}
       />
-      <ModalDeleteOder
+      <ModalDeleteOrder
         isOpen={isModalDelete}
-        oderUserDelete={orderDelete}
+        orderUserDelete={orderDelete}
         handleClose={() => {
           setIsModalDelete(false);
         }}

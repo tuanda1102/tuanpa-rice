@@ -13,13 +13,13 @@ import { useDeleteOrderById } from '@/apis/order.api';
 import appToast from '@/utils/toast.util';
 import { type IOrder } from '@/types/order';
 
-function ModalEditOder({
+function ModalEditOrder({
   isOpen,
-  oderUserDelete,
+  orderUserDelete,
   handleClose,
 }: {
   isOpen: boolean;
-  oderUserDelete?: IOrder;
+  orderUserDelete?: IOrder;
   handleClose: () => void;
 }) {
   const queryClient = useQueryClient();
@@ -30,7 +30,7 @@ function ModalEditOder({
     deleteOrderMutation.mutate(
       {
         menuId: menuId as string,
-        orderId: oderUserDelete?.id as string,
+        orderId: orderUserDelete?.id as string,
       },
       {
         onSuccess() {
@@ -66,7 +66,7 @@ function ModalEditOder({
         <ModalHeader>
           Bạn có chắc chắn muốn đơn
           <span className='mx-2 italic text-primary'>
-            {oderUserDelete?.foodName}
+            {orderUserDelete?.foodName}
           </span>
           !
         </ModalHeader>
@@ -89,4 +89,4 @@ function ModalEditOder({
     </Modal>
   );
 }
-export default ModalEditOder;
+export default ModalEditOrder;

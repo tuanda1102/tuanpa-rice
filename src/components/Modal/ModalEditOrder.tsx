@@ -11,7 +11,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import useSearchParamsCustom from '@/hooks/useSearchParamsCustom';
 import { type INewFeedsSearchParams } from '@/features/NewFeeds/types/newFeeds';
-import { useUpdateOder } from '@/apis/order.api';
+import { useUpdateOrder } from '@/apis/order.api';
 import appToast from '@/utils/toast.util';
 import { useFormWithYupSchema } from '@/hooks/useYupValidationResolver';
 import { orderSchema } from '@/features/NewFeeds/validations/order.validation';
@@ -27,27 +27,27 @@ const defaultValues = {
   status: false,
 };
 
-function ModalEditOder({
+function ModalEditOrder({
   isOpen,
-  editOderUser,
+  editOrderUser,
   handleClose,
 }: {
   isOpen: boolean;
-  editOderUser?: IOrder;
+  editOrderUser?: IOrder;
   handleClose: () => void;
 }) {
   const queryClient = useQueryClient();
   const { authUser } = useFetchUser();
   const { menuId } = useSearchParamsCustom<Partial<INewFeedsSearchParams>>();
-  const updateUser = useUpdateOder();
-  const { isLoading: isLoadingUpdateOrder } = useUpdateOder();
+  const { isLoading: isLoadingUpdateOrder, mutate: updateOrder } =
+    useUpdateOrder();
 
   const methods = useFormWithYupSchema(orderSchema, {
     defaultValues,
     values: {
-      foodName: editOderUser?.foodName,
-      price: editOderUser?.price,
-      status: editOderUser?.status,
+      foodName: editOrderUser?.foodName,
+      price: editOrderUser?.price,
+      status: editOrderUser?.status,
     },
   });
   const {
@@ -57,10 +57,10 @@ function ModalEditOder({
     formState: { isDirty },
   } = methods;
 
-  const submitHandlerUpdateOder = handleSubmit((values) => {
-    const idUser = editOderUser?.id;
+  const submitHandlerUpdateOrder = handleSubmit((values) => {
+    const idUser = editOrderUser?.id;
     if (idUser && menuId) {
-      updateUser.mutate(
+      updateOrder(
         {
           idUser,
           menuId,
@@ -107,7 +107,7 @@ function ModalEditOder({
         <ModalBody>
           <FormProvider {...methods}>
             <form
-              onSubmit={submitHandlerUpdateOder}
+              onSubmit={submitHandlerUpdateOrder}
               className='flex gap-2 items-start'
             >
               <CInputValidation
@@ -162,4 +162,4 @@ function ModalEditOder({
     </Modal>
   );
 }
-export default ModalEditOder;
+export default ModalEditOrder;
