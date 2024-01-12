@@ -45,7 +45,9 @@ function ModalEditOrder({
               text: 'Xóa thành công!',
             },
           });
-          handleClose();
+          if (onClose) {
+            onClose();
+          }
         },
         onError() {
           appToast({
