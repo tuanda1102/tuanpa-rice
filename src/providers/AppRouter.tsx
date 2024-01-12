@@ -47,39 +47,42 @@ function AppRouter() {
   const { authUser, isSuccess } = useFetchUser();
 
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Public Routes */}
-        <Route element={<PublicOutletRouter />}>
-          {renderRoutes(publicRoutes)}
-        </Route>
+    <>
+      {isSuccess && (
+        <BrowserRouter>
+          <Routes>
+            {/* Public Routes */}
+            <Route element={<PublicOutletRouter />}>
+              {renderRoutes(publicRoutes)}
+            </Route>
 
-        {/* Private Routes */}
-        {isSuccess && (
-          <Route element={<ProtectedRouter isAuth={!!authUser?.email} />}>
-            {renderRoutes(privateRoutes)}
-          </Route>
-        )}
+            {/* Private Routes */}
 
-        <Route
-          path='/internal-server-error'
-          element={
-            <Suspense>
-              <InternalServerError />
-            </Suspense>
-          }
-        />
+            <Route element={<ProtectedRouter isAuth={!!authUser?.email} />}>
+              {renderRoutes(privateRoutes)}
+            </Route>
 
-        <Route
-          path='*'
-          element={
-            <Suspense>
-              <PageNotFound />
-            </Suspense>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+            <Route
+              path='/internal-server-error'
+              element={
+                <Suspense>
+                  <InternalServerError />
+                </Suspense>
+              }
+            />
+
+            <Route
+              path='*'
+              element={
+                <Suspense>
+                  <PageNotFound />
+                </Suspense>
+              }
+            />
+          </Routes>
+        </BrowserRouter>
+      )}
+    </>
   );
 }
 
