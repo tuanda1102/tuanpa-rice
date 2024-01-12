@@ -7,7 +7,7 @@ import {
   Checkbox,
   cn,
 } from '@nextui-org/react';
-import { FaRegEdit } from 'react-icons/fa';
+import { CiEdit } from 'react-icons/ci';
 import { IoAdd } from 'react-icons/io5';
 import { Controller, FormProvider } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
@@ -191,7 +191,7 @@ function FormOrder({
                 disabled={!isDirty || isLoadingUpdateOrder}
                 type='submit'
                 className='!h-input min-w-[120px]'
-                startContent={<FaRegEdit size={22} />}
+                startContent={<CiEdit size={22} />}
               >
                 Sửa
               </Button>
