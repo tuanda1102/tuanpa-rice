@@ -1,12 +1,10 @@
 import {
   Avatar,
-  Button,
   Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
 } from '@nextui-org/react';
-import { FcDonate } from 'react-icons/fc';
 import { IoIosLogOut } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
@@ -16,6 +14,8 @@ import { PUBLIC_URL } from '@/constants/routerUrl';
 import { removeLocalStorageByKey } from '@/utils/localStorage.util';
 import { ThemeSwitcher } from '@/components/ThemeSwitcher/ThemeSwitcher';
 import ModalQRCode from '@/components/Modal/ModalQRCode';
+import ModalDonate from '@/components/Modal/ModalDonate';
+import ModalRankDonate from '@/components/Modal/ModalRankDonate';
 
 function Header() {
   const navigate = useNavigate();
@@ -32,18 +32,9 @@ function Header() {
     <header className='h-header flex gap-2 items-center justify-between'>
       <ModalQRCode />
       <div className='flex gap-2 justify-end items-center'>
-        <Button
-          size='lg'
-          radius='full'
-          color='danger'
-          className='text-white'
-          startContent={<FcDonate />}
-        >
-          Góp tiền nuôi Xoăn cùng TuanPA
-        </Button>
-
+        <ModalRankDonate />
+        <ModalDonate />
         <ThemeSwitcher />
-
         <Dropdown placement='bottom-end'>
           <DropdownTrigger>
             <Avatar
