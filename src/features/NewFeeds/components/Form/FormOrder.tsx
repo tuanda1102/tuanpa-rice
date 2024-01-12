@@ -47,7 +47,6 @@ function FormOrder({
   const { mutate, isLoading: isLoadingAddOrder } = useAddOrder();
   const { isLoading: isLoadingUpdateOrder, mutate: updateOrder } =
     useUpdateOrder();
-
   const methods = useFormWithYupSchema(orderSchema, {
     defaultValues,
     values: {
@@ -188,7 +187,11 @@ function FormOrder({
             {editOrderUser ? (
               <Button
                 isLoading={isLoadingUpdateOrder}
-                disabled={!isDirty || isLoadingUpdateOrder}
+                disabled={
+                  editOrderUser?.userEmail !== authUser?.email ||
+                  !isDirty ||
+                  isLoadingUpdateOrder
+                }
                 type='submit'
                 className='!h-input min-w-[120px]'
                 startContent={<CiEdit size={22} />}
