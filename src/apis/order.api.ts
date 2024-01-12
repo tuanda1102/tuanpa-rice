@@ -33,8 +33,14 @@ export const useAddMenu = () => {
 };
 
 const updateOrder = async (data: IUpdateOrder) => {
-  const userDoc = doc(firebaseDB, 'menu', data.menuId, 'ordered', data.idUser);
-  const res = await updateDoc(userDoc, data.body);
+  const orderDoc = doc(
+    firebaseDB,
+    'menu',
+    data.menuId,
+    'ordered',
+    data.idOrder,
+  );
+  const res = await updateDoc(orderDoc, data.body);
   return res;
 };
 

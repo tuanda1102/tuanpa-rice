@@ -63,11 +63,11 @@ function FormOrder({
   } = methods;
 
   const submitHandler = handleSubmit((values) => {
-    const idUser = editOrderUser?.id;
-    if (idUser && menuId && onClose) {
+    const idOrder = editOrderUser?.id;
+    if (idOrder && menuId && onClose) {
       updateOrder(
         {
-          idUser,
+          idOrder,
           menuId,
           body: {
             userEmail: authUser?.email as string,

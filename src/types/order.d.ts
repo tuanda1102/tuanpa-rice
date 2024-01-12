@@ -12,7 +12,7 @@ export interface IOrder {
 
 export interface IUpdateOrder {
   menuId: string;
-  idUser: string;
+  idOrder: string;
   body: Partial<IOrder>;
 }
 export interface IOrderSchema extends Omit<IOrder, 'id' | 'price' | 'menuId'> {}

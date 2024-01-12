@@ -14,18 +14,18 @@ import { useDeleteOrderById } from '@/apis/order.api';
 import appToast from '@/utils/toast.util';
 import { type IOrder } from '@/types/order';
 
-interface IModalEditOrder extends Partial<ModalProps> {
+interface IModalDeleteOrder extends Partial<ModalProps> {
   isOpen: boolean;
   orderUserDelete?: IOrder;
 }
 
-function ModalEditOrder({
+function ModalDeleteOrder({
   isOpen,
   orderUserDelete,
   shadow,
   onClose,
   ...passProps
-}: IModalEditOrder) {
+}: IModalDeleteOrder) {
   const queryClient = useQueryClient();
   const { menuId } = useSearchParamsCustom<Partial<INewFeedsSearchParams>>();
   const deleteOrderMutation = useDeleteOrderById();
@@ -89,4 +89,4 @@ function ModalEditOrder({
     </Modal>
   );
 }
-export default ModalEditOrder;
+export default ModalDeleteOrder;
