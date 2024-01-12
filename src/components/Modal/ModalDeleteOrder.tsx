@@ -15,7 +15,6 @@ import appToast from '@/utils/toast.util';
 import { type IOrder } from '@/types/order';
 
 interface IModalDeleteOrder extends Partial<ModalProps> {
-  isOpen: boolean;
   orderUserDelete?: IOrder;
 }
 
