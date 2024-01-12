@@ -7,6 +7,7 @@ import {
   Checkbox,
   cn,
 } from '@nextui-org/react';
+import { FaRegEdit } from 'react-icons/fa';
 import { IoAdd } from 'react-icons/io5';
 import { Controller, FormProvider } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
@@ -187,11 +188,12 @@ function FormOrder({
             {editOrderUser ? (
               <Button
                 isLoading={isLoadingUpdateOrder}
-                disabled={!isDirty}
+                disabled={!isDirty || isLoadingUpdateOrder}
                 type='submit'
                 className='!h-input min-w-[120px]'
+                startContent={<FaRegEdit size={22} />}
               >
-                Save
+                Sửa
               </Button>
             ) : (
               <Button
