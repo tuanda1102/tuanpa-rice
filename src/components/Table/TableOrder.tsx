@@ -9,61 +9,39 @@ import {
   Divider,
   Spinner,
   Chip,
-  useDisclosure,
-  Modal,
-  ModalBody,
-  ModalHeader,
   Button,
-  ModalContent,
 } from '@nextui-org/react';
+import { FaRegEdit } from 'react-icons/fa';
 import { HiOutlineShoppingCart } from 'react-icons/hi';
 import { FcReuse } from 'react-icons/fc';
 import { useState } from 'react';
 import { MdDeleteOutline } from 'react-icons/md';
-import { useQueryClient } from '@tanstack/react-query';
 
 import useSearchParamsCustom from '@/hooks/useSearchParamsCustom';
 import { type INewFeedsSearchParams } from '@/features/NewFeeds/types/newFeeds';
-import { useDeleteOrderById, useGetOrderedListById } from '@/apis/order.api';
+import { useGetOrderedListById } from '@/apis/order.api';
 import { type IOrder } from '@/types/order';
-import appToast from '@/utils/toast.util';
+import ModalEditOrder from '@/components/Modal/ModalEditOder';
+import ModalDeleteOrder from '@/components/Modal/ModalDeleteOrder';
 
 function TableOrder({ ...passProps }: TableProps) {
-  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [orderDelete, setOrderDelete] = useState<IOrder | undefined>(undefined);
-  const queryClient = useQueryClient();
+  const [isModalDelete, setIsModalDelete] = useState(false);
+  const [isModalEdit, setIsModalEdit] = useState(false);
+  const [valueOrderEdit, setValueOderEdit] = useState<IOrder | undefined>(
+    undefined,
+  );
+
   const { menuId } = useSearchParamsCustom<Partial<INewFeedsSearchParams>>();
-
   const { orderedList, isLoading } = useGetOrderedListById(menuId as string);
-  const deleteOrderMutation = useDeleteOrderById();
 
-  const handleDeleteOrder = () => {
-    deleteOrderMutation.mutate(
-      {
-        menuId: menuId as string,
-        orderId: orderDelete?.id as string,
-      },
-      {
-        onSuccess() {
-          queryClient.invalidateQueries(['get-menu-by-id', menuId]);
-          appToast({
-            type: 'success',
-            props: {
-              text: 'Xóa thành công!',
-            },
-          });
-          onClose();
-        },
-        onError() {
-          appToast({
-            type: 'error',
-            props: {
-              text: 'Xóa thất bại, vui lòng thử lại!',
-            },
-          });
-        },
-      },
-    );
+  const handleEditOrder = (ordered: IOrder) => {
+    setIsModalEdit(true);
+    setValueOderEdit(ordered);
+  };
+  const handleDeleteOrder = (ordered: IOrder) => {
+    setOrderDelete(ordered);
+    setIsModalDelete(true);
   };
 
   if (!menuId) {
@@ -78,39 +56,6 @@ function TableOrder({ ...passProps }: TableProps) {
 
   return (
     <>
-      <Modal
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
-        onClose={() => {
-          setOrderDelete(undefined);
-        }}
-      >
-        <ModalContent>
-          <ModalHeader>
-            Bạn có chắc chắn muốn đơn
-            <span className='mx-2 italic text-primary'>
-              {orderDelete?.foodName}
-            </span>
-            !
-          </ModalHeader>
-          <ModalBody>
-            <div className='flex items-center justify-end gap-2'>
-              <Button onClick={onOpen}>Hủy</Button>
-              <Button
-                isLoading={deleteOrderMutation.isLoading}
-                disabled={deleteOrderMutation.isLoading}
-                color='danger'
-                onClick={() => {
-                  handleDeleteOrder();
-                }}
-              >
-                Xóa
-              </Button>
-            </div>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-
       <Table
         isHeaderSticky
         shadow='none'
@@ -152,7 +97,9 @@ function TableOrder({ ...passProps }: TableProps) {
             ? orderedList.map((ordered, index) => (
                 <TableRow key={ordered.id}>
                   <TableCell>{index + 1}</TableCell>
+
                   <TableCell>{ordered.userEmail}</TableCell>
+
                   <TableCell>{ordered.foodName}</TableCell>
                   <TableCell className='text-right'>
                     {ordered.price || '-'}
@@ -167,11 +114,17 @@ function TableOrder({ ...passProps }: TableProps) {
                       {ordered.status ? 'Đã thanh toán' : 'Nợ'}
                     </Chip>
                   </TableCell>
-                  <TableCell className='text-end'>
+                  <TableCell className='text-end '>
+                    <Button
+                      onClick={() => handleEditOrder(ordered)}
+                      isIconOnly
+                      className='mr-2'
+                    >
+                      <FaRegEdit size={22} />
+                    </Button>
                     <Button
                       onClick={() => {
-                        onOpen();
-                        setOrderDelete(ordered);
+                        handleDeleteOrder(ordered);
                       }}
                       isIconOnly
                       color='danger'
@@ -185,6 +138,18 @@ function TableOrder({ ...passProps }: TableProps) {
             : []}
         </TableBody>
       </Table>
+      <ModalEditOrder
+        isOpen={isModalEdit}
+        editOrderUser={valueOrderEdit}
+        shadow='sm'
+        onClose={() => setIsModalEdit(false)}
+      />
+      <ModalDeleteOrder
+        isOpen={isModalDelete}
+        orderUserDelete={orderDelete}
+        shadow='sm'
+        onClose={() => setIsModalDelete(false)}
+      />
     </>
   );
 }

@@ -10,4 +10,9 @@ export interface IOrder {
   updatedAt: Date;
 }
 
+export interface IUpdateOrder {
+  menuId: string;
+  idOrder: string;
+  body: Partial<IOrder>;
+}
 export interface IOrderSchema extends Omit<IOrder, 'id' | 'price' | 'menuId'> {}

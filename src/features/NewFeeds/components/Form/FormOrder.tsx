@@ -14,14 +14,20 @@ import { useQueryClient } from '@tanstack/react-query';
 import CInputValidation from '@/components/Input/CInputValidation';
 import CNumberInput from '@/components/Input/CNumberInput';
 import { orderSchema } from '@/features/NewFeeds/validations/order.validation';
-import { useAddOrder } from '@/apis/order.api';
+import { useAddOrder, useUpdateOrder } from '@/apis/order.api';
 import useSearchParamsCustom from '@/hooks/useSearchParamsCustom';
 import { type INewFeedsSearchParams } from '@/features/NewFeeds/types/newFeeds';
 import { useFetchUser } from '@/apis/user.api';
 import appToast from '@/utils/toast.util';
 import { useFormWithYupSchema } from '@/hooks/useYupValidationResolver';
+import { type IOrder } from '@/types/order';
 
 interface IFormOrderProps extends CardProps {}
+
+interface IFormAddOrder extends IFormOrderProps {
+  editOrderUser?: IOrder;
+  onClose?: () => void;
+}
 
 const defaultValues = {
   foodName: '',
@@ -29,48 +35,104 @@ const defaultValues = {
   status: false,
 };
 
-function FormOrder({ ...passCardProps }: IFormOrderProps) {
+function FormOrder({
+  editOrderUser,
+  onClose,
+  ...passCardProps
+}: IFormAddOrder) {
   const { menuId } = useSearchParamsCustom<INewFeedsSearchParams>();
   const queryClient = useQueryClient();
   const { authUser } = useFetchUser();
   const { mutate, isLoading: isLoadingAddOrder } = useAddOrder();
-  const methods = useFormWithYupSchema(orderSchema, { defaultValues });
+  const { isLoading: isLoadingUpdateOrder, mutate: updateOrder } =
+    useUpdateOrder();
 
-  const { control, handleSubmit, reset } = methods;
+  const methods = useFormWithYupSchema(orderSchema, {
+    defaultValues,
+    values: {
+      foodName: editOrderUser?.foodName,
+      price: editOrderUser?.price,
+      status: editOrderUser?.status,
+    },
+  });
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isDirty },
+  } = methods;
 
   const submitHandler = handleSubmit((values) => {
-    mutate(
-      {
-        menuId,
-        body: {
-          userEmail: authUser?.email as string,
-          foodName: values.foodName,
-          status: values.status,
-          price: Number(values.price) || null,
-          createdAt: new Date(),
+    const idOrder = editOrderUser?.id;
+    if (idOrder && menuId && onClose) {
+      updateOrder(
+        {
+          idOrder,
+          menuId,
+          body: {
+            userEmail: authUser?.email as string,
+            foodName: values.foodName,
+            status: values.status,
+            price: Number(values.price) || null,
+            createdAt: new Date(),
+          },
         },
-      },
-      {
-        onSuccess() {
-          queryClient.invalidateQueries(['get-menu-by-id', menuId]);
-          appToast({
-            type: 'success',
-            props: {
-              text: 'Đặt đơn thành công!',
-            },
-          });
-          reset(defaultValues);
+        {
+          onSuccess() {
+            queryClient.invalidateQueries(['get-menu-by-id', menuId]);
+            appToast({
+              type: 'success',
+              props: {
+                text: 'Chỉnh sửa thành công!',
+              },
+            });
+            reset(defaultValues);
+            onClose();
+          },
+          onError() {
+            appToast({
+              type: 'error',
+              props: {
+                text: 'Chỉnh sửa thất bại, vui lòng thử lại!',
+              },
+            });
+          },
         },
-        onError() {
-          appToast({
-            type: 'error',
-            props: {
-              text: 'Đặt đơn thất bại, vui lòng thử lại!',
-            },
-          });
+      );
+    } else {
+      mutate(
+        {
+          menuId,
+          body: {
+            userEmail: authUser?.email as string,
+            foodName: values.foodName,
+            status: values.status,
+            price: Number(values.price) || null,
+            createdAt: new Date(),
+          },
         },
-      },
-    );
+        {
+          onSuccess() {
+            queryClient.invalidateQueries(['get-menu-by-id', menuId]);
+            appToast({
+              type: 'success',
+              props: {
+                text: 'Đặt đơn thành công!',
+              },
+            });
+            reset(defaultValues);
+          },
+          onError() {
+            appToast({
+              type: 'error',
+              props: {
+                text: 'Đặt đơn thất bại, vui lòng thử lại!',
+              },
+            });
+          },
+        },
+      );
+    }
   });
 
   return (
@@ -122,16 +184,26 @@ function FormOrder({ ...passCardProps }: IFormOrderProps) {
                 </Checkbox>
               )}
             />
-
-            <Button
-              isLoading={isLoadingAddOrder}
-              disabled={isLoadingAddOrder}
-              type='submit'
-              className='!h-input min-w-[120px]'
-              startContent={<IoAdd size={20} />}
-            >
-              Đặt món
-            </Button>
+            {editOrderUser ? (
+              <Button
+                isLoading={isLoadingUpdateOrder}
+                disabled={!isDirty}
+                type='submit'
+                className='!h-input min-w-[120px]'
+              >
+                Save
+              </Button>
+            ) : (
+              <Button
+                isLoading={isLoadingAddOrder}
+                disabled={isLoadingAddOrder}
+                type='submit'
+                className='!h-input min-w-[120px]'
+                startContent={<IoAdd size={20} />}
+              >
+                Đặt món
+              </Button>
+            )}
           </form>
         </FormProvider>
       </CardBody>

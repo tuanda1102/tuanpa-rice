@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
+  updateDoc,
   addDoc,
   getDocs,
   collection,
@@ -13,7 +14,7 @@ import {
 import { MenuCollectionRef } from '@/constants/firebaseCollections.constant';
 import { type IMenu } from '@/types/menu';
 import { firebaseDB } from '@/config/firebase.config';
-import { type IOrder } from '@/types/order';
+import { type IOrder, type IUpdateOrder } from '@/types/order';
 
 /**
  * Thêm menu
@@ -34,6 +35,27 @@ export const useAddMenu = () => {
   });
 };
 
+const updateOrder = async (data: IUpdateOrder) => {
+  const orderDoc = doc(
+    firebaseDB,
+    'menu',
+    data.menuId,
+    'ordered',
+    data.idOrder,
+  );
+  const res = await updateDoc(orderDoc, data.body);
+  return res;
+};
+
+export const useUpdateOrder = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['get-menu']);
+    },
+  });
+};
 /**
  * Lấy menu
  */
