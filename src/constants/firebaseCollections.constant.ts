@@ -5,3 +5,4 @@ import { firebaseDB } from '@/config/firebase.config';
 export const UsersCollectionRef = collection(firebaseDB, 'users');
 export const MenuCollectionRef = collection(firebaseDB, 'menu');
 export const OrdersCollectionRef = collection(firebaseDB, 'orders');
+export const DonateCollectionRef = collection(firebaseDB, 'donate');
