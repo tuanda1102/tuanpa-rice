@@ -23,13 +23,13 @@ import { donateSchema } from '@/features/NewFeeds/validations/donate.validation'
 function ModalDonate() {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const { authUser } = useFetchUser();
-  const addDonate = useAddDonate();
+  const { mutate: addDonate, isLoading } = useAddDonate();
 
   const methods = useFormWithYupSchema(donateSchema);
   const { handleSubmit, reset } = methods;
 
   const submitHandler = handleSubmit((values: Partial<IDonate>) => {
-    addDonate.mutate(
+    addDonate(
       {
         userEmail: authUser?.email as string,
         price: values.price,
@@ -109,6 +109,7 @@ function ModalDonate() {
                   <div className='m-8 flex justify-between'>
                     <Button onPress={onClose}>Close</Button>
                     <Button
+                      isLoading={isLoading}
                       type='submit'
                       startContent={<FcDonate />}
                       color='primary'
