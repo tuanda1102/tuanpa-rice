@@ -18,7 +18,7 @@ import {
 } from '@nextui-org/react';
 import { HiOutlineShoppingCart } from 'react-icons/hi';
 import { FcReuse } from 'react-icons/fc';
-import { useCallback, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { MdDeleteOutline } from 'react-icons/md';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -49,19 +49,53 @@ function TableOrder({
   const { orderedList, isLoading } = useGetOrderedListById(menuId as string);
   const deleteOrderMutation = useDeleteOrderById();
 
-  const discountedPrice = useCallback(
-    (currentPrice: number | null) => {
+  const OrderList = useMemo(() => {
+    const discountedPrice = (currentPrice: number | null) => {
       if (isSamePrice) {
         return currentPrice;
       }
+      const percentSale = priceSale / Number(price);
+      const salePrice = Number(percentSale * Number(price));
 
-      const percentSale = Number(
-        (((Number(price) - priceSale) / Number(currentPrice)) * 100).toFixed(1),
-      );
-      return (Number(currentPrice) * percentSale) / 100;
-    },
-    [isSamePrice, priceSale, price],
-  );
+      return Number(currentPrice) - salePrice;
+    };
+    if (orderedList?.length) {
+      return orderedList.map((ordered, index) => (
+        <TableRow key={ordered.id}>
+          <TableCell>{index + 1}</TableCell>
+          <TableCell>{ordered.userEmail}</TableCell>
+          <TableCell>{ordered.foodName}</TableCell>
+          <TableCell className='text-right'>
+            {discountedPrice(ordered.price) || '-'}
+          </TableCell>
+          <TableCell className='text-center'>
+            <Chip
+              className='capitalize min-w-[120px]'
+              color={ordered.status ? 'success' : 'danger'}
+              size='sm'
+              variant='flat'
+            >
+              {ordered.status ? 'Đã thanh toán' : 'Nợ'}
+            </Chip>
+          </TableCell>
+          <TableCell className='text-end'>
+            <Button
+              onClick={() => {
+                onOpen();
+                setOrderDelete(ordered);
+              }}
+              isIconOnly
+              color='danger'
+              variant='flat'
+            >
+              <MdDeleteOutline size={22} />
+            </Button>
+          </TableCell>
+        </TableRow>
+      ));
+    }
+    return [];
+  }, [isSamePrice, onOpen, orderedList, price, priceSale]);
 
   const handleDeleteOrder = () => {
     deleteOrderMutation.mutate(
@@ -172,43 +206,9 @@ function TableOrder({
               ''
             )
           }
-          items={orderedList || []}
+          items={OrderList}
         >
-          {orderedList?.length
-            ? orderedList.map((ordered, index) => (
-                <TableRow key={ordered.id}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{ordered.userEmail}</TableCell>
-                  <TableCell>{ordered.foodName}</TableCell>
-                  <TableCell className='text-right'>
-                    {discountedPrice(ordered.price) || '-'}
-                  </TableCell>
-                  <TableCell className='text-center'>
-                    <Chip
-                      className='capitalize min-w-[120px]'
-                      color={ordered.status ? 'success' : 'danger'}
-                      size='sm'
-                      variant='flat'
-                    >
-                      {ordered.status ? 'Đã thanh toán' : 'Nợ'}
-                    </Chip>
-                  </TableCell>
-                  <TableCell className='text-end'>
-                    <Button
-                      onClick={() => {
-                        onOpen();
-                        setOrderDelete(ordered);
-                      }}
-                      isIconOnly
-                      color='danger'
-                      variant='flat'
-                    >
-                      <MdDeleteOutline size={22} />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            : []}
+          {OrderList}
         </TableBody>
       </Table>
     </>
