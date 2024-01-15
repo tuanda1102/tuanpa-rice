@@ -7,4 +7,5 @@ export const PRIVATE_URL = {
   order: '/order',
   dashboard: '/dashboard',
   newFeeds: '/',
+  rankDonate: '/rank-donate',
 };
