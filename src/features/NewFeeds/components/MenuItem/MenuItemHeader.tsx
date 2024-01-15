@@ -1,13 +1,30 @@
-import { Avatar, Button } from '@nextui-org/react';
+import { CiEdit } from 'react-icons/ci';
+import {
+  Avatar,
+  Button,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  useDisclosure,
+} from '@nextui-org/react';
 import { type HTMLAttributes } from 'react';
 import { GoKebabHorizontal } from 'react-icons/go';
+import { MdDeleteOutline } from 'react-icons/md';
+import ModalDeleteMenu from '@/features/NewFeeds/components/Modal/ModalDeleteMenu';
+import ModalMenu from '@/features/NewFeeds/components/Modal/ModalMenu';
+import { type IMenu } from '@/types/menu';
+import { useFetchUser } from '@/apis/user.api';
 
 interface IMenuItemHeaderProps extends HTMLAttributes<HTMLDivElement> {
-  userEmail: string;
-  userAvatar: string;
+  menu: IMenu;
 }
 
-function MenuItemHeader({ userAvatar, userEmail }: IMenuItemHeaderProps) {
+function MenuItemHeader({ menu }: IMenuItemHeaderProps) {
+  const deleteDisclosure = useDisclosure();
+  const updateDisclosure = useDisclosure();
+  const { authUser } = useFetchUser();
+  const { createdByUser, id } = menu;
   return (
     <div className='flex justify-between items-center w-full'>
       <div className='flex items-center gap-3'>
@@ -16,14 +33,53 @@ function MenuItemHeader({ userAvatar, userEmail }: IMenuItemHeaderProps) {
           size='sm'
           color='secondary'
           className='text-sm'
-          src={userAvatar}
+          src={createdByUser}
         />
-        <span>{userEmail}</span>
+        <span>{createdByUser}</span>
       </div>
 
-      <Button isIconOnly variant='ghost' className='border-0'>
-        <GoKebabHorizontal size={18} />
-      </Button>
+      {authUser?.email === createdByUser && (
+        <Button isIconOnly variant='ghost' className='border-0'>
+          <Dropdown placement='bottom-end'>
+            <DropdownTrigger>
+              <Button>
+                <GoKebabHorizontal size={18} />
+              </Button>
+            </DropdownTrigger>
+
+            <DropdownMenu aria-label='menu Actions' variant='flat'>
+              <DropdownItem
+                startContent={<CiEdit size={22} />}
+                onClick={updateDisclosure.onOpen}
+                key='edit'
+              >
+                Sửa menu
+              </DropdownItem>
+              <DropdownItem
+                startContent={<MdDeleteOutline size={22} />}
+                key='delete'
+                color='danger'
+                onClick={deleteDisclosure.onOpen}
+              >
+                Xóa menu
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+          <ModalMenu
+            dataMenu={menu}
+            onClose={updateDisclosure.onClose}
+            onOpenChange={updateDisclosure.onOpenChange}
+            isOpen={updateDisclosure.isOpen}
+          />
+
+          <ModalDeleteMenu
+            menuId={id}
+            onClose={deleteDisclosure.onClose}
+            onOpenChange={deleteDisclosure.onOpenChange}
+            isOpen={deleteDisclosure.isOpen}
+          />
+        </Button>
+      )}
     </div>
   );
 }

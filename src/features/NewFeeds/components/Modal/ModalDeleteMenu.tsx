@@ -3,11 +3,9 @@ import {
   Modal,
   ModalContent,
   type ModalProps,
-  useDisclosure,
   ModalBody,
   ModalHeader,
 } from '@nextui-org/react';
-import { IoTrashOutline } from 'react-icons/io5';
 import { useQueryClient } from '@tanstack/react-query';
 import { useDeleteMenu } from '@/apis/order.api';
 import appToast from '@/utils/toast.util';
@@ -17,7 +15,6 @@ interface IModalMenuProps extends Omit<ModalProps, 'children'> {
 }
 
 function ModalDeleteMenu({ menuId, ...passProps }: IModalMenuProps) {
-  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const queryClient = useQueryClient();
   const { isLoading, mutate } = useDeleteMenu();
 
@@ -33,7 +30,7 @@ function ModalDeleteMenu({ menuId, ...passProps }: IModalMenuProps) {
               text: 'Xóa thành công!',
             },
           });
-          onClose();
+          passProps.onClose?.();
         },
         onError() {
           appToast({
@@ -42,17 +39,14 @@ function ModalDeleteMenu({ menuId, ...passProps }: IModalMenuProps) {
               text: 'Xóa thất bại!',
             },
           });
-          onClose();
+          passProps.onClose?.();
         },
       },
     );
   };
   return (
     <div>
-      <Button isIconOnly className='border-0' variant='ghost' onClick={onOpen}>
-        <IoTrashOutline size={22} />
-      </Button>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} {...passProps}>
+      <Modal {...passProps}>
         <ModalContent>
           {() => (
             <>
@@ -61,7 +55,7 @@ function ModalDeleteMenu({ menuId, ...passProps }: IModalMenuProps) {
               </ModalHeader>
               <ModalBody>
                 <div className='flex items-center justify-end gap-2'>
-                  <Button onClick={onClose}>Hủy</Button>
+                  <Button onClick={passProps.onClose}>Hủy</Button>
                   <Button
                     isLoading={isLoading}
                     disabled={isLoading}

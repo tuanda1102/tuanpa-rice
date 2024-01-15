@@ -18,7 +18,7 @@ import {
 } from '@nextui-org/react';
 import { HiOutlineShoppingCart } from 'react-icons/hi';
 import { FcReuse } from 'react-icons/fc';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { MdDeleteOutline } from 'react-icons/md';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -28,14 +28,40 @@ import { useDeleteOrderById, useGetOrderedListById } from '@/apis/order.api';
 import { type IOrder } from '@/types/order';
 import appToast from '@/utils/toast.util';
 
-function TableOrder({ ...passProps }: TableProps) {
-  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-  const [orderDelete, setOrderDelete] = useState<IOrder | undefined>(undefined);
+interface ITableOrder extends TableProps {
+  price: number;
+  priceSale: number;
+  isSamePrice: boolean | undefined;
+}
+
+function TableOrder({
+  price,
+  priceSale,
+  isSamePrice,
+  ...passProps
+}: ITableOrder) {
   const queryClient = useQueryClient();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const { menuId } = useSearchParamsCustom<Partial<INewFeedsSearchParams>>();
+
+  const [orderDelete, setOrderDelete] = useState<IOrder | undefined>(undefined);
 
   const { orderedList, isLoading } = useGetOrderedListById(menuId as string);
   const deleteOrderMutation = useDeleteOrderById();
+
+  const discountedPrice = useCallback(
+    (currentPrice: number | null) => {
+      if (isSamePrice) {
+        return currentPrice;
+      }
+
+      const percentSale = Number(
+        (((Number(price) - priceSale) / Number(currentPrice)) * 100).toFixed(1),
+      );
+      return (Number(currentPrice) * percentSale) / 100;
+    },
+    [isSamePrice, priceSale, price],
+  );
 
   const handleDeleteOrder = () => {
     deleteOrderMutation.mutate(
@@ -155,7 +181,7 @@ function TableOrder({ ...passProps }: TableProps) {
                   <TableCell>{ordered.userEmail}</TableCell>
                   <TableCell>{ordered.foodName}</TableCell>
                   <TableCell className='text-right'>
-                    {ordered.price || '-'}
+                    {discountedPrice(ordered.price) || '-'}
                   </TableCell>
                   <TableCell className='text-center'>
                     <Chip

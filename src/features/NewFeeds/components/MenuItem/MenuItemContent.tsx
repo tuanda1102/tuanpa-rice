@@ -6,7 +6,7 @@ import MenuItemActions from './MenuItemActions';
 interface IMenuItemContentProps
   extends Pick<
     IMenu,
-    'title' | 'createdByUser' | 'menuLink' | 'id' | 'isBlocked'
+    'title' | 'createdByUser' | 'menuLink' | 'id' | 'isBlocked' | 'createdAt'
   > {
   isContentOnly: boolean;
 }
