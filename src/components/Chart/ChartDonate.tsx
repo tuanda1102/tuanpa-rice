@@ -1,10 +1,19 @@
 import Chart from 'react-apexcharts';
 
-function ChartDonate(dataDonate: any) {
-  const labels = dataDonate?.dataDonate?.map(([userEmail]: string) => {
-    return userEmail;
-  });
-  const prices = dataDonate?.dataDonate?.map((price: number[]) => price[1]);
+type DonationData = Array<[string, number]>;
+
+interface IDataDonate {
+  dataDonate: DonationData;
+}
+function ChartDonate(dataDonate: IDataDonate) {
+  const labels = dataDonate?.dataDonate?.map(
+    ([userEmail]: [string, number]) => {
+      return userEmail;
+    },
+  );
+  const prices = dataDonate?.dataDonate?.map(
+    (price: [string, number]) => price[1],
+  );
 
   const options = {
     chart: {
@@ -39,7 +48,7 @@ function ChartDonate(dataDonate: any) {
     },
   ];
 
-  return <Chart options={options} series={series} type='bar' height={450} />;
+  return <Chart options={options} series={series} type='bar' height={800} />;
 }
 
 export { ChartDonate };

@@ -11,7 +11,7 @@ import {
   Chip,
   Button,
 } from '@nextui-org/react';
-import { FaRegEdit } from 'react-icons/fa';
+import { CiEdit } from 'react-icons/ci';
 import { HiOutlineShoppingCart } from 'react-icons/hi';
 import { FcReuse } from 'react-icons/fc';
 import { useState } from 'react';
@@ -120,7 +120,7 @@ function TableOrder({ ...passProps }: TableProps) {
                       isIconOnly
                       className='mr-2'
                     >
-                      <FaRegEdit size={22} />
+                      <CiEdit size={22} />
                     </Button>
                     <Button
                       onClick={() => {

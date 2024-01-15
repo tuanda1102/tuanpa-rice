@@ -58,7 +58,7 @@ function ModalDonate() {
   });
 
   return (
-    <div>
+    <>
       <Button
         onPress={onOpen}
         size='lg'
@@ -69,11 +69,12 @@ function ModalDonate() {
       >
         Góp tiền nuôi Xoăn cùng TuanPA
       </Button>
+
       <Modal size='md' isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
           <ModalBody>
-            <div>
-              <div className='flex flex-row  justify-center  items-center '>
+            <>
+              <div className='flex flex-row justify-center items-center'>
                 <Avatar
                   isBordered
                   as='button'
@@ -82,7 +83,6 @@ function ModalDonate() {
                 />
                 <div className='p-4 font-medium'>{authUser?.name}</div>
               </div>
-
               <div>
                 <Image
                   width={400}
@@ -92,8 +92,8 @@ function ModalDonate() {
                 />
               </div>
               <FormProvider {...methods}>
-                <form onSubmit={submitHandler} className=''>
-                  <div className='flex flex-row p-4 justify-center  items-center '>
+                <form onSubmit={submitHandler}>
+                  <div className='flex flex-row p-4 justify-center items-center'>
                     <p className='px-2 font-medium text-xl'>
                       Nơi đón nhận lòng tốt
                     </p>
@@ -101,12 +101,12 @@ function ModalDonate() {
                   </div>
 
                   <CNumberInput
-                    classNameWrapper='mb-0 '
-                    label='Số tiền Donate '
+                    classNameWrapper='mb-0'
+                    label='Số tiền Donate'
                     name='price'
                     id='price'
                   />
-                  <div className=' m-8  flex justify-between'>
+                  <div className='m-8 flex justify-between'>
                     <Button onPress={onClose}>Close</Button>
                     <Button
                       type='submit'
@@ -118,11 +118,11 @@ function ModalDonate() {
                   </div>
                 </form>
               </FormProvider>
-            </div>
+            </>
           </ModalBody>
         </ModalContent>
       </Modal>
-    </div>
+    </>
   );
 }
 export default ModalDonate;
