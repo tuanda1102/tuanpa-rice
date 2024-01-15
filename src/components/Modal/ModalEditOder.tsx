@@ -9,7 +9,6 @@ import { type IOrder } from '@/types/order';
 import FormOrder from '@/features/NewFeeds/components/Form/FormOrder';
 
 interface IModalEditOrder extends Partial<ModalProps> {
-  isOpen: boolean;
   editOrderUser?: IOrder;
 }
 

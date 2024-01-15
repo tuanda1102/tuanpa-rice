@@ -7,6 +7,7 @@ import {
   Checkbox,
   cn,
 } from '@nextui-org/react';
+import { CiEdit } from 'react-icons/ci';
 import { IoAdd } from 'react-icons/io5';
 import { Controller, FormProvider } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
@@ -46,7 +47,6 @@ function FormOrder({
   const { mutate, isLoading: isLoadingAddOrder } = useAddOrder();
   const { isLoading: isLoadingUpdateOrder, mutate: updateOrder } =
     useUpdateOrder();
-
   const methods = useFormWithYupSchema(orderSchema, {
     defaultValues,
     values: {
@@ -187,11 +187,16 @@ function FormOrder({
             {editOrderUser ? (
               <Button
                 isLoading={isLoadingUpdateOrder}
-                disabled={!isDirty}
+                disabled={
+                  editOrderUser?.userEmail !== authUser?.email ||
+                  !isDirty ||
+                  isLoadingUpdateOrder
+                }
                 type='submit'
                 className='!h-input min-w-[120px]'
+                startContent={<CiEdit size={22} />}
               >
-                Save
+                Sửa
               </Button>
             ) : (
               <Button
