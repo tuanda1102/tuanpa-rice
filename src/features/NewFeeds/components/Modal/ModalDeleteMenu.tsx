@@ -7,7 +7,6 @@ import {
   ModalBody,
   ModalHeader,
 } from '@nextui-org/react';
-import { IoTrashOutline } from 'react-icons/io5';
 import { useQueryClient } from '@tanstack/react-query';
 import { useDeleteMenu } from '@/apis/order.api';
 import appToast from '@/utils/toast.util';
@@ -17,7 +16,7 @@ interface IModalMenuProps extends Omit<ModalProps, 'children'> {
 }
 
 function ModalDeleteMenu({ menuId, ...passProps }: IModalMenuProps) {
-  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const { isOpen, onOpenChange, onClose } = useDisclosure();
   const queryClient = useQueryClient();
   const { isLoading, mutate } = useDeleteMenu();
 
@@ -49,9 +48,6 @@ function ModalDeleteMenu({ menuId, ...passProps }: IModalMenuProps) {
   };
   return (
     <div>
-      <Button isIconOnly className='border-0' variant='ghost' onClick={onOpen}>
-        <IoTrashOutline size={22} />
-      </Button>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} {...passProps}>
         <ModalContent>
           {() => (

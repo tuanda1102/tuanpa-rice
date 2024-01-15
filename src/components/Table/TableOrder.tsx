@@ -9,39 +9,121 @@ import {
   Divider,
   Spinner,
   Chip,
+  useDisclosure,
+  Modal,
+  ModalBody,
+  ModalHeader,
   Button,
+  ModalContent,
 } from '@nextui-org/react';
-import { CiEdit } from 'react-icons/ci';
 import { HiOutlineShoppingCart } from 'react-icons/hi';
 import { FcReuse } from 'react-icons/fc';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { MdDeleteOutline } from 'react-icons/md';
+import { useQueryClient } from '@tanstack/react-query';
 
 import useSearchParamsCustom from '@/hooks/useSearchParamsCustom';
 import { type INewFeedsSearchParams } from '@/features/NewFeeds/types/newFeeds';
-import { useGetOrderedListById } from '@/apis/order.api';
+import { useDeleteOrderById, useGetOrderedListById } from '@/apis/order.api';
 import { type IOrder } from '@/types/order';
-import ModalEditOrder from '@/components/Modal/ModalEditOder';
-import ModalDeleteOrder from '@/components/Modal/ModalDeleteOrder';
+import appToast from '@/utils/toast.util';
 
-function TableOrder({ ...passProps }: TableProps) {
-  const [orderDelete, setOrderDelete] = useState<IOrder | undefined>(undefined);
-  const [isModalDelete, setIsModalDelete] = useState(false);
-  const [isModalEdit, setIsModalEdit] = useState(false);
-  const [valueOrderEdit, setValueOderEdit] = useState<IOrder | undefined>(
-    undefined,
-  );
+interface ITableOrder extends TableProps {
+  price: number;
+  priceSale: number;
+  isSamePrice: boolean | undefined;
+}
 
+function TableOrder({
+  price,
+  priceSale,
+  isSamePrice,
+  ...passProps
+}: ITableOrder) {
+  const queryClient = useQueryClient();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const { menuId } = useSearchParamsCustom<Partial<INewFeedsSearchParams>>();
-  const { orderedList, isLoading } = useGetOrderedListById(menuId as string);
 
-  const handleEditOrder = (ordered: IOrder) => {
-    setIsModalEdit(true);
-    setValueOderEdit(ordered);
-  };
-  const handleDeleteOrder = (ordered: IOrder) => {
-    setOrderDelete(ordered);
-    setIsModalDelete(true);
+  const [orderDelete, setOrderDelete] = useState<IOrder | undefined>(undefined);
+
+  const { orderedList, isLoading } = useGetOrderedListById(menuId as string);
+  const deleteOrderMutation = useDeleteOrderById();
+
+  const OrderList = useMemo(() => {
+    const discountedPrice = (currentPrice: number | null) => {
+      if (isSamePrice) {
+        return currentPrice;
+      }
+      const percentSale = priceSale / Number(price);
+      const salePrice = Number(percentSale * Number(price));
+
+      return Number(currentPrice) - salePrice;
+    };
+    if (orderedList?.length) {
+      return orderedList.map((ordered, index) => (
+        <TableRow key={ordered.id}>
+          <TableCell>{index + 1}</TableCell>
+          <TableCell>{ordered.userEmail}</TableCell>
+          <TableCell>{ordered.foodName}</TableCell>
+          <TableCell className='text-right'>
+            {discountedPrice(ordered.price) || '-'}
+          </TableCell>
+          <TableCell className='text-center'>
+            <Chip
+              className='capitalize min-w-[120px]'
+              color={ordered.status ? 'success' : 'danger'}
+              size='sm'
+              variant='flat'
+            >
+              {ordered.status ? 'Đã thanh toán' : 'Nợ'}
+            </Chip>
+          </TableCell>
+          <TableCell className='text-end'>
+            <Button
+              onClick={() => {
+                onOpen();
+                setOrderDelete(ordered);
+              }}
+              isIconOnly
+              color='danger'
+              variant='flat'
+            >
+              <MdDeleteOutline size={22} />
+            </Button>
+          </TableCell>
+        </TableRow>
+      ));
+    }
+    return [];
+  }, [isSamePrice, onOpen, orderedList, price, priceSale]);
+
+  const handleDeleteOrder = () => {
+    deleteOrderMutation.mutate(
+      {
+        menuId: menuId as string,
+        orderId: orderDelete?.id as string,
+      },
+      {
+        onSuccess() {
+          queryClient.invalidateQueries(['get-menu-by-id', menuId]);
+          appToast({
+            type: 'success',
+            props: {
+              text: 'Xóa thành công!',
+            },
+          });
+          onClose();
+        },
+        onError() {
+          appToast({
+            type: 'error',
+            props: {
+              text: 'Xóa thất bại, vui lòng thử lại!',
+            },
+          });
+        },
+      },
+    );
   };
 
   if (!menuId) {
@@ -56,6 +138,39 @@ function TableOrder({ ...passProps }: TableProps) {
 
   return (
     <>
+      <Modal
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        onClose={() => {
+          setOrderDelete(undefined);
+        }}
+      >
+        <ModalContent>
+          <ModalHeader>
+            Bạn có chắc chắn muốn đơn
+            <span className='mx-2 italic text-primary'>
+              {orderDelete?.foodName}
+            </span>
+            !
+          </ModalHeader>
+          <ModalBody>
+            <div className='flex items-center justify-end gap-2'>
+              <Button onClick={onOpen}>Hủy</Button>
+              <Button
+                isLoading={deleteOrderMutation.isLoading}
+                disabled={deleteOrderMutation.isLoading}
+                color='danger'
+                onClick={() => {
+                  handleDeleteOrder();
+                }}
+              >
+                Xóa
+              </Button>
+            </div>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+
       <Table
         isHeaderSticky
         shadow='none'
@@ -91,65 +206,11 @@ function TableOrder({ ...passProps }: TableProps) {
               ''
             )
           }
-          items={orderedList || []}
+          items={OrderList}
         >
-          {orderedList?.length
-            ? orderedList.map((ordered, index) => (
-                <TableRow key={ordered.id}>
-                  <TableCell>{index + 1}</TableCell>
-
-                  <TableCell>{ordered.userEmail}</TableCell>
-
-                  <TableCell>{ordered.foodName}</TableCell>
-                  <TableCell className='text-right'>
-                    {ordered.price || '-'}
-                  </TableCell>
-                  <TableCell className='text-center'>
-                    <Chip
-                      className='capitalize min-w-[120px]'
-                      color={ordered.status ? 'success' : 'danger'}
-                      size='sm'
-                      variant='flat'
-                    >
-                      {ordered.status ? 'Đã thanh toán' : 'Nợ'}
-                    </Chip>
-                  </TableCell>
-                  <TableCell className='text-end '>
-                    <Button
-                      onClick={() => handleEditOrder(ordered)}
-                      isIconOnly
-                      className='mr-2'
-                    >
-                      <CiEdit size={22} />
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        handleDeleteOrder(ordered);
-                      }}
-                      isIconOnly
-                      color='danger'
-                      variant='flat'
-                    >
-                      <MdDeleteOutline size={22} />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            : []}
+          {OrderList}
         </TableBody>
       </Table>
-      <ModalEditOrder
-        isOpen={isModalEdit}
-        editOrderUser={valueOrderEdit}
-        shadow='sm'
-        onClose={() => setIsModalEdit(false)}
-      />
-      <ModalDeleteOrder
-        isOpen={isModalDelete}
-        orderUserDelete={orderDelete}
-        shadow='sm'
-        onClose={() => setIsModalDelete(false)}
-      />
     </>
   );
 }

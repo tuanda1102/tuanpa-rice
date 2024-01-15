@@ -79,25 +79,25 @@ export const useMenu = () => {
 };
 
 /**
- * Khóa menu
+ * Update menu
  */
 
-interface IBlockMenu {
+interface IUpdateMenu {
   menuId: string;
   body: Partial<IMenu>;
 }
 
-const blockMenu = async (data: IBlockMenu) => {
+const updateMenu = async (data: IUpdateMenu) => {
   const menuRef = doc(firebaseDB, 'menu', data.menuId);
   const res = await updateDoc(menuRef, data.body);
   return res;
 };
 
-export const useBlockMenu = () => {
+export const useUpdateMenu = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: blockMenu,
+    mutationFn: updateMenu,
     onSuccess() {
       queryClient.invalidateQueries(['get-menu']);
     },

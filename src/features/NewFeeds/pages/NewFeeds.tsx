@@ -17,7 +17,11 @@ function NewFeeds() {
       <NewFeedsMenu />
 
       <div className='w-full h-full flex flex-col justify-between items-center gap-4'>
-        <TableOrder />
+        <TableOrder
+          price={currentMenu?.price}
+          priceSale={currentMenu?.priceSale}
+          isSamePrice={currentMenu?.isSamePrice}
+        />
         {menuId && !currentMenu?.isBlocked ? (
           <div className='flex-grow'>
             <FormOrder />
