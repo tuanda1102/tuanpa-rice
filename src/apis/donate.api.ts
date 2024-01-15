@@ -4,6 +4,10 @@ import { addDoc, getDocs } from 'firebase/firestore';
 import { type IDonate } from '@/types/donates';
 import { DonateCollectionRef } from '@/constants/firebaseCollections.constant';
 
+/*
+ * lấy data donate
+ */
+
 const getDonate = async () => {
   const donate = await getDocs(DonateCollectionRef);
   return donate.docs.map((elem) => ({
@@ -20,6 +24,10 @@ export const useDonate = () => {
 
   return { donateList, ...queryOptions };
 };
+
+/*
+ * thêm nguời donate
+ */
 
 const addDonate = async (data: Partial<IDonate>) => {
   const res = await addDoc(DonateCollectionRef, data);
