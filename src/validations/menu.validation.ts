@@ -12,10 +12,17 @@ export const menuSchema = Yup.object().shape({
       },
     )
     .nullable(),
-  price: Yup.number(),
+  price: Yup.number()
+    .when('isSamePrice', {
+      is: (isSamePrice: boolean) => isSamePrice === true,
+      then: () =>
+        Yup.number().required('Price is required when isSamePrice is true'),
+      otherwise: () => Yup.number().nullable(),
+    })
+    .nullable(),
   priceSale: Yup.number()
     .when('price', {
-      is: (price: number) => price !== undefined,
+      is: (price: number) => price !== null,
       then: (priceSchema) =>
         priceSchema.test(
           'is-less-than-price',
@@ -26,6 +33,7 @@ export const menuSchema = Yup.object().shape({
             return priceSale !== undefined && priceSale < price;
           },
         ),
+      otherwise: () => Yup.number().nullable(),
     })
     .nullable(),
   menuLink: Yup.string().nullable(),
