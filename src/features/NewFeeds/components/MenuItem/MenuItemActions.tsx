@@ -1,21 +1,22 @@
-import { Button } from '@nextui-org/react';
+import { Button, useDisclosure } from '@nextui-org/react';
 import { useSearchParams } from 'react-router-dom';
 
 import { IoAdd, IoLockClosedOutline, IoLockOpenOutline } from 'react-icons/io5';
 import { type IMenu } from '@/types/menu';
 import { useUpdateMenu } from '@/apis/order.api';
 import appToast from '@/utils/toast.util';
-import ModalDeleteMenu from '@/features/NewFeeds/components/Modal/ModalDeleteMenu';
+import ModalMenu from '@/features/NewFeeds/components/Modal/ModalMenu';
 import { useFetchUser } from '@/apis/user.api';
 
-function MenuItemActions({
-  id,
-  isBlocked,
-  createdByUser,
-}: Pick<IMenu, 'id' | 'isBlocked' | 'createdByUser'>) {
+interface IMenuItemAction {
+  menu: IMenu;
+}
+function MenuItemActions({ menu }: IMenuItemAction) {
+  const { id, isBlocked, isSamePrice, createdByUser } = menu;
+  const { onClose, isOpen, onOpenChange, onOpen } = useDisclosure();
+
   const [searchParams, setSearchParams] = useSearchParams();
   const { authUser } = useFetchUser();
-
   const toggleMenu = useUpdateMenu();
 
   const handleClickOrder = () => {
@@ -25,6 +26,9 @@ function MenuItemActions({
 
   const handleToggleMenu = () => {
     const data = { menuId: id, body: { isBlocked: !isBlocked } };
+    if (!isSamePrice) {
+      onOpen();
+    }
     toggleMenu.mutate(data, {
       onSuccess() {
         appToast({
@@ -67,7 +71,12 @@ function MenuItemActions({
                 <IoLockOpenOutline size={22} />
               )}
             </Button>
-            <ModalDeleteMenu menuId={id} />
+            <ModalMenu
+              onClose={onClose}
+              onOpenChange={onOpenChange}
+              isOpen={isOpen}
+              dataMenu={menu}
+            />
           </div>
         ) : (
           ''

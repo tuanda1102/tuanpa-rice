@@ -3,31 +3,16 @@ import { Link } from '@nextui-org/react';
 import { type IMenu } from '@/types/menu';
 import MenuItemActions from './MenuItemActions';
 
-interface IMenuItemContentProps
-  extends Pick<
-    IMenu,
-    'title' | 'createdByUser' | 'menuLink' | 'id' | 'isBlocked' | 'createdAt'
-  > {
-  isContentOnly: boolean;
+interface IMenuItemContentProps {
+  menu: IMenu;
 }
 
-function MenuItemContent({
-  isContentOnly = false,
-  title,
-  menuLink,
-  id,
-  createdByUser,
-  isBlocked,
-}: IMenuItemContentProps) {
+function MenuItemContent({ menu }: IMenuItemContentProps) {
+  const { createdByUser, title, menuLink, image } = menu;
+  const isContentOnly = !image;
   return (
     <div className='w-full'>
-      {!isContentOnly && (
-        <MenuItemActions
-          isBlocked={isBlocked}
-          id={id}
-          createdByUser={createdByUser}
-        />
-      )}
+      {!isContentOnly && <MenuItemActions menu={menu} />}
       <p className='text-small italic'>
         {!isContentOnly && (
           <span className='font-semibold me-2'>{createdByUser}</span>
@@ -46,13 +31,7 @@ function MenuItemContent({
       ) : (
         ''
       )}
-      {isContentOnly && (
-        <MenuItemActions
-          isBlocked={isBlocked}
-          id={id}
-          createdByUser={createdByUser}
-        />
-      )}
+      {isContentOnly && <MenuItemActions menu={menu} />}
     </div>
   );
 }
