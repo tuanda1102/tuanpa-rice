@@ -3,3 +3,7 @@ export interface IDonate {
   userEmail: string;
   price: number;
 }
+export interface IDataChart {
+  labels?: string[];
+  prices?: number[];
+}

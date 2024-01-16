@@ -1,20 +1,7 @@
-import Chart from 'react-apexcharts';
+import ReactApexChart from 'react-apexcharts';
+import { type IDataChart } from '@/types/donates';
 
-type DonationData = Array<[string, number]>;
-
-interface IDataDonate {
-  dataDonate: DonationData;
-}
-function ChartDonate(dataDonate: IDataDonate) {
-  const labels = dataDonate?.dataDonate?.map(
-    ([userEmail]: [string, number]) => {
-      return userEmail;
-    },
-  );
-  const prices = dataDonate?.dataDonate?.map(
-    (price: [string, number]) => price[1],
-  );
-
+function ChartDonate({ labels, prices }: IDataChart) {
   const options = {
     chart: {
       id: 'bar',
@@ -44,11 +31,18 @@ function ChartDonate(dataDonate: IDataDonate) {
   const series = [
     {
       name: 'Ranking Donate',
-      data: prices,
+      data: prices || [0, 0],
     },
   ];
 
-  return <Chart options={options} series={series} type='bar' height={800} />;
+  return (
+    <ReactApexChart
+      options={options}
+      series={series}
+      type='bar'
+      className='w-full h-[50vh]'
+    />
+  );
 }
 
 export { ChartDonate };

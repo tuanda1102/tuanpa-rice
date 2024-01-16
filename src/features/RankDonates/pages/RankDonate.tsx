@@ -3,17 +3,21 @@ import { FaRankingStar } from 'react-icons/fa6';
 import { IoArrowBack } from 'react-icons/io5';
 
 import { useNavigate } from 'react-router-dom';
-import { useDonate } from '@/apis/donate.api';
-import { calculateRankDonate } from '@/utils/function';
-import { ChartDonate } from '@/components/Chart/ChartDonate';
 import ModalDonate from '@/components/Modal/ModalDonate';
+import { useCalculateDonates } from '@/hooks/useCalculateDonate';
+import { ChartDonate } from '@/components/Chart/ChartDonate';
+import { type IDonate } from '@/types/donates';
 
 function RankDonate() {
   const navigate = useNavigate();
-  const { donateList } = useDonate();
 
-  const rankDonate =
-    donateList !== undefined ? calculateRankDonate(donateList) : [];
+  const rankDonate = useCalculateDonates();
+  const labels = rankDonate?.map((item: IDonate) => {
+    return item.userEmail;
+  });
+  const prices = rankDonate?.map((item: IDonate) => {
+    return item.price;
+  });
 
   return (
     <>
@@ -35,8 +39,8 @@ function RankDonate() {
           </div>
         </div>
 
-        <div>
-          <ChartDonate dataDonate={rankDonate} />
+        <div className='flex w-full justify-center'>
+          <ChartDonate labels={labels} prices={prices} />
         </div>
         <div className='flex justify-center'>
           <ModalDonate />
