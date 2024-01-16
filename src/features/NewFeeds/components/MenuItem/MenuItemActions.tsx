@@ -26,8 +26,33 @@ function MenuItemActions({ menu }: IMenuItemAction) {
 
   const handleToggleMenu = () => {
     const data = { menuId: id, body: { isBlocked: !isBlocked } };
-    if (!isSamePrice) {
-      onOpen();
+    if (!isBlocked) {
+      if (!isSamePrice) {
+        onOpen();
+      }
+    }
+    if (isOpen) {
+      toggleMenu.mutate(data, {
+        onSuccess() {
+          appToast({
+            type: 'success',
+            props: {
+              text: isBlocked
+                ? 'Mở menu thành công nà =))))'
+                : 'Đóng menu thành công nà =))))',
+            },
+          });
+        },
+        onError() {
+          appToast({
+            type: 'error',
+            props: {
+              title: 'Cóa lỗi :((((',
+              text: 'Thử lại dùm mình chứ lỗi mất roài =))))',
+            },
+          });
+        },
+      });
     }
     toggleMenu.mutate(data, {
       onSuccess() {

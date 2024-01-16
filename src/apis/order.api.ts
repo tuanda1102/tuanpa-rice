@@ -8,6 +8,7 @@ import {
   deleteDoc,
   query,
   orderBy,
+  getDoc,
 } from 'firebase/firestore';
 
 import { MenuCollectionRef } from '@/constants/firebaseCollections.constant';
@@ -29,7 +30,7 @@ export const useAddMenu = () => {
   return useMutation({
     mutationFn: addMenu,
     onSuccess() {
-      queryClient.invalidateQueries(['get-menu']);
+      queryClient.invalidateQueries(['get-menus']);
     },
   });
 };
@@ -51,14 +52,14 @@ export const useUpdateOrder = () => {
   return useMutation({
     mutationFn: updateOrder,
     onSuccess: () => {
-      queryClient.invalidateQueries(['get-menu']);
+      queryClient.invalidateQueries(['get-menus']);
     },
   });
 };
 /**
  * Lấy menu
  */
-const getMenu = async () => {
+const getMenus = async () => {
   const menu = await getDocs(
     query(MenuCollectionRef, orderBy('createdAt', 'desc')),
   );
@@ -69,13 +70,31 @@ const getMenu = async () => {
   return menuList;
 };
 
-export const useMenu = () => {
+export const useMenus = () => {
   const { data: menuList, ...queryOptions } = useQuery({
-    queryKey: ['get-menu'],
-    queryFn: getMenu,
+    queryKey: ['get-menus'],
+    queryFn: getMenus,
   });
 
   return { menuList, ...queryOptions };
+};
+
+const getMenu = async (menuId: string) => {
+  const menuRef = doc(firebaseDB, 'menu', menuId);
+  const docSnap = await getDoc(menuRef);
+
+  if (docSnap.exists()) {
+    // Trả về dữ liệu menu nếu tìm thấy
+    return docSnap.data();
+  }
+  return {};
+};
+
+export const useMenu = (menuId: string) => {
+  return useQuery({
+    queryKey: ['get-menu'],
+    queryFn: () => getMenu(menuId),
+  });
 };
 
 /**
@@ -99,7 +118,7 @@ export const useUpdateMenu = () => {
   return useMutation({
     mutationFn: updateMenu,
     onSuccess() {
-      queryClient.invalidateQueries(['get-menu']);
+      queryClient.invalidateQueries(['get-menus']);
     },
   });
 };

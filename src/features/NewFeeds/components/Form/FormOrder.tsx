@@ -15,7 +15,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import CInputValidation from '@/components/Input/CInputValidation';
 import CNumberInput from '@/components/Input/CNumberInput';
 import { orderSchema } from '@/features/NewFeeds/validations/order.validation';
-import { useAddOrder, useUpdateOrder } from '@/apis/order.api';
+import { useAddOrder, useUpdateOrder, useMenu } from '@/apis/order.api';
 import useSearchParamsCustom from '@/hooks/useSearchParamsCustom';
 import { type INewFeedsSearchParams } from '@/features/NewFeeds/types/newFeeds';
 import { useFetchUser } from '@/apis/user.api';
@@ -44,7 +44,10 @@ function FormOrder({
   const { menuId } = useSearchParamsCustom<INewFeedsSearchParams>();
   const queryClient = useQueryClient();
   const { authUser } = useFetchUser();
+
   const { mutate, isLoading: isLoadingAddOrder } = useAddOrder();
+  const { data } = useMenu(menuId);
+
   const { isLoading: isLoadingUpdateOrder, mutate: updateOrder } =
     useUpdateOrder();
   const methods = useFormWithYupSchema(orderSchema, {
@@ -55,6 +58,7 @@ function FormOrder({
       status: editOrderUser?.status,
     },
   });
+
   const {
     control,
     handleSubmit,
@@ -79,15 +83,26 @@ function FormOrder({
         },
         {
           onSuccess() {
-            queryClient.invalidateQueries(['get-menu-by-id', menuId]);
-            appToast({
-              type: 'success',
-              props: {
-                text: 'Chỉnh sửa thành công!',
-              },
-            });
-            reset(defaultValues);
-            onClose();
+            if (data?.isBlocked) {
+              queryClient.invalidateQueries(['get-menu-by-id', menuId]);
+              queryClient.invalidateQueries(['get-menu']);
+              appToast({
+                type: 'error',
+                props: {
+                  text: 'Đã hết thời gian đặt rùi!!!',
+                },
+              });
+            } else {
+              queryClient.invalidateQueries(['get-menu-by-id', menuId]);
+              appToast({
+                type: 'success',
+                props: {
+                  text: 'Chỉnh sửa thành công!',
+                },
+              });
+              reset(defaultValues);
+              onClose();
+            }
           },
           onError() {
             appToast({

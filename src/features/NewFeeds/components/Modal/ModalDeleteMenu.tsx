@@ -3,7 +3,6 @@ import {
   Modal,
   ModalContent,
   type ModalProps,
-  useDisclosure,
   ModalBody,
   ModalHeader,
 } from '@nextui-org/react';
@@ -15,8 +14,7 @@ interface IModalMenuProps extends Omit<ModalProps, 'children'> {
   menuId: string;
 }
 
-function ModalDeleteMenu({ menuId, ...passProps }: IModalMenuProps) {
-  const { isOpen, onOpenChange, onClose } = useDisclosure();
+function ModalDeleteMenu({ menuId, onClose, ...passProps }: IModalMenuProps) {
   const queryClient = useQueryClient();
   const { isLoading, mutate } = useDeleteMenu();
 
@@ -25,14 +23,14 @@ function ModalDeleteMenu({ menuId, ...passProps }: IModalMenuProps) {
       { menuId },
       {
         onSuccess() {
-          queryClient.invalidateQueries(['get-menu']);
+          queryClient.invalidateQueries(['get-menus']);
           appToast({
             type: 'success',
             props: {
               text: 'Xóa thành công!',
             },
           });
-          onClose();
+          onClose?.();
         },
         onError() {
           appToast({
@@ -41,14 +39,14 @@ function ModalDeleteMenu({ menuId, ...passProps }: IModalMenuProps) {
               text: 'Xóa thất bại!',
             },
           });
-          onClose();
+          onClose?.();
         },
       },
     );
   };
   return (
     <div>
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} {...passProps}>
+      <Modal {...passProps}>
         <ModalContent>
           {() => (
             <>
