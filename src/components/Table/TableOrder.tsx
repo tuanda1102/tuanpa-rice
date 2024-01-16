@@ -54,10 +54,9 @@ function TableOrder({
       if (isSamePrice) {
         return currentPrice;
       }
-      const percentSale = priceSale / Number(price);
-      const salePrice = Number(percentSale * Number(price));
-
-      return Number(currentPrice) - salePrice;
+      const percentSale = (priceSale / Number(price)) * 100;
+      const salePrice = Number((percentSale * Number(currentPrice)) / 100);
+      return Math.ceil((Number(currentPrice) - salePrice) / 1000) * 1000;
     };
     if (orderedList?.length) {
       return orderedList.map((ordered, index) => (
