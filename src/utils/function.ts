@@ -5,19 +5,22 @@ interface TotalPrices {
 }
 
 export const calculateRankDonate = (data: IDonate[]) => {
-  const totalPrices: TotalPrices = {};
+  const totalPrices = data.reduce((accumulator: TotalPrices, currentItem) => {
+    const userEmail = currentItem.userEmail.toLowerCase();
 
-  // eslint-disable-next-line array-callback-return
-  data.map((items: IDonate) => {
-    const userEmail = items.userEmail.toLowerCase();
-    if (!totalPrices[userEmail]) {
-      totalPrices[userEmail] = 0;
+    if (!accumulator[userEmail]) {
+      accumulator[userEmail] = 0;
     }
-    totalPrices[userEmail] += items.price;
-  });
-  const rankDonate = Object.entries(totalPrices).sort(
-    (donateFirst, donateSecond) => donateFirst[1] - donateSecond[1],
-  );
 
-  return rankDonate;
+    accumulator[userEmail] += currentItem.price;
+
+    return accumulator;
+  }, {});
+  const dataRankDonate = Object.entries(totalPrices).map(
+    ([userEmail, price]) => ({
+      userEmail,
+      price,
+    }),
+  );
+  return dataRankDonate;
 };

@@ -16,10 +16,13 @@ const getDonate = async () => {
   })) as IDonate[];
 };
 
-export const useDonate = () => {
+export const useDonate = (
+  select?: ((data: IDonate[]) => IDonate[]) | undefined,
+) => {
   const { data: donateList, ...queryOptions } = useQuery({
     queryKey: ['get-Donate'],
     queryFn: getDonate,
+    select,
   });
 
   return { donateList, ...queryOptions };
