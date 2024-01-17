@@ -28,14 +28,14 @@ function RankDonate() {
           }}
           variant='ghost'
           className='text-white'
-          startContent={<IoArrowBack color='black' />}
+          startContent={<IoArrowBack className='text-black  dark:text-white' />}
         />
       </div>
       <div className='flex flex-col w-full justify-center'>
         <div className='flex flex-row w-full justify-center items-end'>
           <p className='text-2xl font-semibold text-end'>Xếp hạng Donate</p>
           <div className='p-[6px]'>
-            <FaRankingStar color='black' size={40} />
+            <FaRankingStar className='text-black  dark:text-white' size={40} />
           </div>
         </div>
 

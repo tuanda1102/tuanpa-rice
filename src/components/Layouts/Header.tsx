@@ -42,7 +42,12 @@ function Header() {
             radius='full'
             variant='ghost'
             className='text-white'
-            startContent={<FaRankingStar color='black' size={24} />}
+            startContent={
+              <FaRankingStar
+                className='text-black  dark:text-white'
+                size={24}
+              />
+            }
           />
         </Tooltip>
         <ModalDonate />
