@@ -1,46 +1,127 @@
 import {
   Button,
+  Checkbox,
   Modal,
   ModalBody,
   ModalContent,
   ModalHeader,
   type ModalProps,
-  useDisclosure,
 } from '@nextui-org/react';
-import { FormProvider } from 'react-hook-form';
+import { Controller, FormProvider } from 'react-hook-form';
 import { IoMdAdd } from 'react-icons/io';
 
+import { yupResolver } from '@hookform/resolvers/yup';
 import { type IUploadCloudinaryInfo } from '@/types/upload';
 import CInputUploadFile from '@/components/Input/CInputUploadFile';
 import CInputValidation from '@/components/Input/CInputValidation';
-import { useMenuForm } from '@/validations/menu.validation';
+import { menuSchema } from '@/validations/menu.validation';
 import { useUploadImage } from '@/apis/upload.api';
 import appToast from '@/utils/toast.util';
 import { type IMenu } from '@/types/menu';
-import { useAddMenu } from '@/apis/order.api';
+import { useAddMenu, useUpdateMenu } from '@/apis/order.api';
 import CNumberInput from '@/components/Input/CNumberInput';
 import { useFetchUser } from '@/apis/user.api';
+import { useFormWithYupSchema } from '@/hooks/useYupValidationResolver';
 
-interface IModalMenuProps extends Omit<ModalProps, 'children'> {}
+interface IModalMenuProps extends Omit<ModalProps, 'children'> {
+  dataMenu?: IMenu;
+}
 
-function ModalMenu({ ...passProps }: IModalMenuProps) {
-  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+const defaultValues = {
+  image: null,
+  title: null,
+  price: null,
+  isSamePrice: false,
+  priceSale: null,
+  menuLink: null,
+};
+
+function ModalMenu({ dataMenu, onClose, ...passProps }: IModalMenuProps) {
   const { authUser } = useFetchUser();
 
+  const toggleMenu = useUpdateMenu();
   const uploadImage = useUploadImage();
+
   const addMenu = useAddMenu();
+  const updateMenu = useUpdateMenu();
 
-  const methods = useMenuForm();
-  const { handleSubmit, reset } = methods;
+  const methods = useFormWithYupSchema(menuSchema, {
+    defaultValues,
+    values: dataMenu,
+    mode: 'onChange',
+    resolver: yupResolver(menuSchema),
+  });
+  const { handleSubmit, reset, control, watch } = methods;
 
+  const isSamePriceWatch = watch('isSamePrice');
+
+  const handleUpdateMenu = (values: Partial<IMenu>) => {
+    const data = {
+      menuId: dataMenu ? dataMenu.id : '',
+      body: { isBlocked: !dataMenu?.isBlocked },
+    };
+    const dataUpdate = {
+      menuId: dataMenu?.id ? dataMenu.id : '',
+      body: {
+        title: values.title,
+        image: values.image,
+        price: values.price || null,
+        priceSale: isSamePriceWatch ? null : values.priceSale,
+        menuLink: values.menuLink || null,
+        isSamePrice: values.isSamePrice,
+        isBlocked: false,
+        isDeleted: false,
+        avatarThumbnail: (authUser?.picture as string) || null,
+        createdByUser: authUser?.email as string,
+        createdAt: new Date(),
+      },
+    };
+    updateMenu.mutate(dataUpdate, {
+      onSuccess() {
+        if (!dataMenu?.isBlocked) {
+          if (!dataMenu?.isSamePrice) {
+            toggleMenu.mutate(data, {
+              onSuccess() {
+                appToast({
+                  type: 'success',
+                  props: {
+                    text: 'Đóng menu thành công nà =))))',
+                  },
+                });
+              },
+              onError() {
+                appToast({
+                  type: 'error',
+                  props: {
+                    title: 'Cóa lỗi :((((',
+                    text: 'Thử lại dùm mình chứ lỗi mất roài =))))',
+                  },
+                });
+              },
+            });
+          }
+        }
+        appToast({
+          type: 'success',
+          props: {
+            text: 'Sửa menu thành công nà =))))',
+          },
+        });
+        reset(defaultValues);
+        onClose?.();
+      },
+    });
+  };
   const handleAddMenu = (values: Partial<IMenu>) => {
     const data = {
       title: values.title,
       image: values.image,
       price: values.price || null,
+      priceSale: isSamePriceWatch ? null : values.priceSale,
       menuLink: values.menuLink || null,
       isBlocked: false,
       isDeleted: false,
+      isSamePrice: values.isSamePrice,
       avatarThumbnail: (authUser?.picture as string) || null,
       createdByUser: authUser?.email as string,
       createdAt: new Date(),
@@ -53,16 +134,43 @@ function ModalMenu({ ...passProps }: IModalMenuProps) {
             text: 'Thêm menu thành công nà =))))',
           },
         });
-        onClose();
-        reset({});
+        reset(defaultValues);
+        onClose?.();
       },
     });
   };
 
   const submitHandler = handleSubmit(async (values) => {
-    if (values.image?.length) {
+    if (dataMenu) {
+      if (values.image?.length) {
+        const uploadRes: IUploadCloudinaryInfo = await uploadImage.mutateAsync(
+          values.image as unknown as FileList,
+          {
+            onError(error) {
+              appToast({
+                type: 'error',
+                props: {
+                  title: 'Cóa lỗi :((((',
+                  text: 'Thử lại dùm mình chứ lỗi mất roài =))))',
+                },
+              });
+
+              // eslint-disable-next-line no-console
+              console.log('UPLOAD-IMAGE-ERROR');
+              throw error;
+            },
+          },
+        );
+
+        if (uploadRes) {
+          handleUpdateMenu({ ...values, image: uploadRes.url });
+        }
+      } else {
+        handleUpdateMenu({ ...values, image: null });
+      }
+    } else if (values.image?.length) {
       const uploadRes: IUploadCloudinaryInfo = await uploadImage.mutateAsync(
-        values.image as FileList,
+        values.image as unknown as FileList,
         {
           onError(error) {
             appToast({
@@ -90,27 +198,17 @@ function ModalMenu({ ...passProps }: IModalMenuProps) {
 
   return (
     <div>
-      <Button
-        size='md'
-        onPress={onOpen}
-        radius='full'
-        color='primary'
-        startContent={<IoMdAdd />}
-      >
-        Tạo Menu
-      </Button>
-
       <Modal
         size='3xl'
-        isOpen={isOpen}
-        onOpenChange={onOpenChange}
         onClose={() => {
-          reset({});
+          reset(defaultValues);
         }}
         {...passProps}
       >
         <ModalContent>
-          <ModalHeader className='flex flex-col gap-1'>Tạo menu</ModalHeader>
+          <ModalHeader className='flex flex-col gap-1'>
+            {dataMenu ? 'Sửa Menu' : 'Tạo Menu'}
+          </ModalHeader>
           <ModalBody>
             <FormProvider {...methods}>
               <form onSubmit={submitHandler}>
@@ -121,11 +219,35 @@ function ModalMenu({ ...passProps }: IModalMenuProps) {
                   id='title'
                 />
 
+                <Controller
+                  control={control}
+                  name='isSamePrice'
+                  render={({ field: { onChange, value } }) => (
+                    <Checkbox
+                      defaultSelected={false}
+                      onChange={onChange}
+                      value={value}
+                      isSelected={value}
+                      className='mb-1'
+                    >
+                      Đồng giá
+                    </Checkbox>
+                  )}
+                />
+
                 <CNumberInput
                   label='Giá món, nhập sau cũng được'
                   name='price'
                   id='price'
                 />
+
+                {isSamePriceWatch === false && (
+                  <CNumberInput
+                    label='Giá sale nè'
+                    name='priceSale'
+                    id='priceSale'
+                  />
+                )}
 
                 <CInputUploadFile
                   label='Up ảnh Menu cho mọi người dễ chọn nhóaaa'
@@ -150,7 +272,7 @@ function ModalMenu({ ...passProps }: IModalMenuProps) {
                     color='primary'
                     startContent={<IoMdAdd />}
                   >
-                    Thêm
+                    {dataMenu ? 'Sửa' : 'Tạo'}
                   </Button>
                 </div>
               </form>

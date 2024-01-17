@@ -3,12 +3,12 @@ import TableOrder from '@/components/Table/TableOrder';
 import NewFeedsMenu from '@/features/NewFeeds/components/NewFeedsMenu/NewFeedsMenu';
 import useSearchParamsCustom from '@/hooks/useSearchParamsCustom';
 import { type INewFeedsSearchParams } from '@/features/NewFeeds/types/newFeeds';
-import { useMenu } from '@/apis/order.api';
+import { useMenus } from '@/apis/order.api';
 
 function NewFeeds() {
   const { menuId } = useSearchParamsCustom<INewFeedsSearchParams>();
 
-  const { menuList } = useMenu();
+  const { menuList } = useMenus();
 
   const currentMenu = menuList?.find((item) => item.id === menuId);
 
@@ -17,7 +17,11 @@ function NewFeeds() {
       <NewFeedsMenu />
 
       <div className='w-full h-full flex flex-col justify-between items-center gap-4'>
-        <TableOrder />
+        <TableOrder
+          price={currentMenu?.price}
+          priceSale={currentMenu?.priceSale}
+          isSamePrice={currentMenu?.isSamePrice}
+        />
         {menuId && !currentMenu?.isBlocked ? (
           <div className='flex-grow'>
             <FormOrder />

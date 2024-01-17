@@ -8,6 +8,7 @@ import {
   deleteDoc,
   query,
   orderBy,
+  getDoc,
 } from 'firebase/firestore';
 
 import { MenuCollectionRef } from '@/constants/firebaseCollections.constant';
@@ -29,7 +30,7 @@ export const useAddMenu = () => {
   return useMutation({
     mutationFn: addMenu,
     onSuccess() {
-      queryClient.invalidateQueries(['get-menu']);
+      queryClient.invalidateQueries(['get-menus']);
     },
   });
 };
@@ -51,14 +52,14 @@ export const useUpdateOrder = () => {
   return useMutation({
     mutationFn: updateOrder,
     onSuccess: () => {
-      queryClient.invalidateQueries(['get-menu']);
+      queryClient.invalidateQueries(['get-menus']);
     },
   });
 };
 /**
  * Lấy menu
  */
-const getMenu = async () => {
+const getMenus = async () => {
   const menu = await getDocs(
     query(MenuCollectionRef, orderBy('createdAt', 'desc')),
   );
@@ -69,37 +70,55 @@ const getMenu = async () => {
   return menuList;
 };
 
-export const useMenu = () => {
+export const useMenus = () => {
   const { data: menuList, ...queryOptions } = useQuery({
-    queryKey: ['get-menu'],
-    queryFn: getMenu,
+    queryKey: ['get-menus'],
+    queryFn: getMenus,
   });
 
   return { menuList, ...queryOptions };
 };
 
+const getMenu = async (menuId: string) => {
+  const menuRef = doc(firebaseDB, 'menu', menuId);
+  const docSnap = await getDoc(menuRef);
+
+  if (docSnap.exists()) {
+    // Trả về dữ liệu menu nếu tìm thấy
+    return docSnap.data();
+  }
+  return {};
+};
+
+export const useMenu = (menuId: string) => {
+  return useQuery({
+    queryKey: ['get-menu'],
+    queryFn: () => getMenu(menuId),
+  });
+};
+
 /**
- * Khóa menu
+ * Update menu
  */
 
-interface IBlockMenu {
+interface IUpdateMenu {
   menuId: string;
   body: Partial<IMenu>;
 }
 
-const blockMenu = async (data: IBlockMenu) => {
+const updateMenu = async (data: IUpdateMenu) => {
   const menuRef = doc(firebaseDB, 'menu', data.menuId);
   const res = await updateDoc(menuRef, data.body);
   return res;
 };
 
-export const useBlockMenu = () => {
+export const useUpdateMenu = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: blockMenu,
+    mutationFn: updateMenu,
     onSuccess() {
-      queryClient.invalidateQueries(['get-menu']);
+      queryClient.invalidateQueries(['get-menus']);
     },
   });
 };
