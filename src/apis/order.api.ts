@@ -163,6 +163,60 @@ export const useAddOrder = () => {
 };
 
 /**
+ * Get all order missing
+ */
+const getAllOrders = async () => {
+  const orderedRef = collection(firebaseDB, 'menu');
+  const ordersSnapshot = await getDocs(orderedRef);
+
+  const filteredOrders = await Promise.all(
+    ordersSnapshot.docs.map(async (menuDoc) => {
+      const menuData = menuDoc.data() as IMenu;
+
+      if (menuData.isBlocked) {
+        const orderedDocsRef = collection(menuDoc.ref, 'ordered');
+        const orderedDocsSnapshot = await getDocs(orderedDocsRef);
+
+        const orderedDataArray = orderedDocsSnapshot.docs.map((orderedDoc) => {
+          const orderData = orderedDoc.data();
+          return {
+            ...orderData,
+            id: orderedDoc.id,
+          };
+        }) as IOrder[];
+
+        const allOrdersStatusTrue = orderedDataArray.every(
+          (order) => order.status === true,
+        );
+
+        return allOrdersStatusTrue ? [] : orderedDataArray;
+      }
+
+      return [];
+    }),
+  );
+
+  const nonEmptyOrders = filteredOrders.filter(
+    (ordersArray) => ordersArray.length > 0,
+  );
+
+  return nonEmptyOrders.flat();
+};
+
+export const useGetAllOrders = () => {
+  const { data: allOrders = [], ...queryOptions } = useQuery({
+    queryKey: ['get-all-orders'],
+    queryFn: getAllOrders,
+  });
+
+  return { allOrders, ...queryOptions };
+};
+
+/**
+ * Get Menu detail by ID
+ */
+
+/**
  * Get Menu detail by ID
  */
 const getOrderedListById = async (menuId: string) => {

@@ -1,4 +1,5 @@
 import { type IDonate } from '@/types/donates';
+import { type IOrder } from '@/types/order';
 
 interface TotalPrices {
   [key: string]: number;
@@ -24,3 +25,13 @@ export const calculateRankDonate = (data: IDonate[]) => {
   );
   return dataRankDonate;
 };
+
+const totalPrice = (listOrder: IOrder[]) =>
+  listOrder.reduce((sum, order) => sum + (Number(order.price) || 0), 0);
+
+const formatterPrice = new Intl.NumberFormat('vi-VN', {
+  style: 'currency',
+  currency: 'VND',
+});
+
+export { totalPrice, formatterPrice };
