@@ -184,21 +184,18 @@ function FormOrder({
                 </Checkbox>
               )}
             />
-            {editOrderUser ? (
+            {editOrderUser && editOrderUser?.userEmail === authUser?.email ? (
               <Button
                 isLoading={isLoadingUpdateOrder}
-                disabled={
-                  editOrderUser?.userEmail !== authUser?.email ||
-                  !isDirty ||
-                  isLoadingUpdateOrder
-                }
+                disabled={!isDirty || isLoadingUpdateOrder}
                 type='submit'
                 className='!h-input min-w-[120px]'
                 startContent={<CiEdit size={22} />}
               >
                 Sửa
               </Button>
-            ) : (
+            ) : null}
+            {!editOrderUser ? null : (
               <Button
                 isLoading={isLoadingAddOrder}
                 disabled={isLoadingAddOrder}
