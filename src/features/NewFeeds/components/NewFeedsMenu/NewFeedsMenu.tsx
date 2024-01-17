@@ -1,12 +1,12 @@
 import { ScrollShadow } from '@nextui-org/react';
 import { CgCoffee } from 'react-icons/cg';
 
-import { useMenu } from '@/apis/order.api';
+import { useMenus } from '@/apis/order.api';
 import MenuItem from '@/features/NewFeeds/components/MenuItem/MenuItem';
 import NewFeedsMenuHeader from '@/features/NewFeeds/components/NewFeedsMenu/NewFeedsMenuHeader';
 
 function NewFeedsMenu() {
-  const { menuList, isSuccess } = useMenu();
+  const { menuList, isSuccess } = useMenus();
 
   return (
     <div className='min-w-[480px] pt-4 flex flex-col'>
