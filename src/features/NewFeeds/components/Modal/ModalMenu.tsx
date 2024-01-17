@@ -36,10 +36,12 @@ const defaultValues = {
   menuLink: null,
 };
 
-function ModalMenu({ dataMenu, ...passProps }: IModalMenuProps) {
+function ModalMenu({ dataMenu, onClose, ...passProps }: IModalMenuProps) {
   const { authUser } = useFetchUser();
 
+  const toggleMenu = useUpdateMenu();
   const uploadImage = useUploadImage();
+
   const addMenu = useAddMenu();
   const updateMenu = useUpdateMenu();
 
@@ -54,6 +56,10 @@ function ModalMenu({ dataMenu, ...passProps }: IModalMenuProps) {
   const isSamePriceWatch = watch('isSamePrice');
 
   const handleUpdateMenu = (values: Partial<IMenu>) => {
+    const data = {
+      menuId: dataMenu ? dataMenu.id : '',
+      body: { isBlocked: !dataMenu?.isBlocked },
+    };
     const dataUpdate = {
       menuId: dataMenu?.id ? dataMenu.id : '',
       body: {
@@ -72,14 +78,37 @@ function ModalMenu({ dataMenu, ...passProps }: IModalMenuProps) {
     };
     updateMenu.mutate(dataUpdate, {
       onSuccess() {
+        if (!dataMenu?.isBlocked) {
+          if (!dataMenu?.isSamePrice) {
+            toggleMenu.mutate(data, {
+              onSuccess() {
+                appToast({
+                  type: 'success',
+                  props: {
+                    text: 'Đóng menu thành công nà =))))',
+                  },
+                });
+              },
+              onError() {
+                appToast({
+                  type: 'error',
+                  props: {
+                    title: 'Cóa lỗi :((((',
+                    text: 'Thử lại dùm mình chứ lỗi mất roài =))))',
+                  },
+                });
+              },
+            });
+          }
+        }
         appToast({
           type: 'success',
           props: {
-            text: 'Thêm menu thành công nà =))))',
+            text: 'Sửa menu thành công nà =))))',
           },
         });
         reset(defaultValues);
-        passProps.onClose?.();
+        onClose?.();
       },
     });
   };
@@ -102,11 +131,11 @@ function ModalMenu({ dataMenu, ...passProps }: IModalMenuProps) {
         appToast({
           type: 'success',
           props: {
-            text: 'Sửa menu thành công nà =))))',
+            text: 'Thêm menu thành công nà =))))',
           },
         });
         reset(defaultValues);
-        passProps.onClose?.();
+        onClose?.();
       },
     });
   };
@@ -233,7 +262,7 @@ function ModalMenu({ dataMenu, ...passProps }: IModalMenuProps) {
                 />
 
                 <div className='flex justify-end gap-1'>
-                  <Button variant='light' onPress={passProps.onClose}>
+                  <Button variant='light' onPress={onClose}>
                     Close
                   </Button>
                   <Button

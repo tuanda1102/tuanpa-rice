@@ -30,16 +30,13 @@ function MenuItemActions({ menu }: IMenuItemAction) {
       if (!isSamePrice) {
         onOpen();
       }
-    }
-    if (isOpen) {
+    } else {
       toggleMenu.mutate(data, {
         onSuccess() {
           appToast({
             type: 'success',
             props: {
-              text: isBlocked
-                ? 'Mở menu thành công nà =))))'
-                : 'Đóng menu thành công nà =))))',
+              text: 'Mở menu thành công nà =))))',
             },
           });
         },
@@ -54,27 +51,6 @@ function MenuItemActions({ menu }: IMenuItemAction) {
         },
       });
     }
-    toggleMenu.mutate(data, {
-      onSuccess() {
-        appToast({
-          type: 'success',
-          props: {
-            text: isBlocked
-              ? 'Mở menu thành công nà =))))'
-              : 'Đóng menu thành công nà =))))',
-          },
-        });
-      },
-      onError() {
-        appToast({
-          type: 'error',
-          props: {
-            title: 'Cóa lỗi :((((',
-            text: 'Thử lại dùm mình chứ lỗi mất roài =))))',
-          },
-        });
-      },
-    });
   };
 
   return (
