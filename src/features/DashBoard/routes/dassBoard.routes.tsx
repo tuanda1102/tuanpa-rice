@@ -1,4 +1,5 @@
 import { lazy } from 'react';
+
 import { PRIVATE_URL } from '@/constants/routerUrl';
 import { type IRoute } from '@/types/routes';
 
