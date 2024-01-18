@@ -200,9 +200,7 @@ function ModalMenu({ dataMenu, onClose, ...passProps }: IModalMenuProps) {
     <div>
       <Modal
         size='3xl'
-        onClose={() => {
-          reset(defaultValues);
-        }}
+        onClose={() => (dataMenu ? reset({}) : reset(defaultValues))}
         {...passProps}
       >
         <ModalContent>
@@ -262,12 +260,27 @@ function ModalMenu({ dataMenu, onClose, ...passProps }: IModalMenuProps) {
                 />
 
                 <div className='flex justify-end gap-1'>
-                  <Button variant='light' onPress={onClose}>
+                  <Button
+                    variant='light'
+                    onPress={() => {
+                      onClose?.();
+                      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+                      dataMenu ? reset({}) : reset(defaultValues);
+                    }}
+                  >
                     Close
                   </Button>
                   <Button
-                    disabled={uploadImage.isLoading || addMenu.isLoading}
-                    isLoading={uploadImage.isLoading || addMenu.isLoading}
+                    disabled={
+                      uploadImage.isLoading ||
+                      addMenu.isLoading ||
+                      updateMenu.isLoading
+                    }
+                    isLoading={
+                      uploadImage.isLoading ||
+                      addMenu.isLoading ||
+                      updateMenu.isLoading
+                    }
                     type='submit'
                     color='primary'
                     startContent={<IoMdAdd />}
