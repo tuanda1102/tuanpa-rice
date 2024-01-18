@@ -210,7 +210,7 @@ function FormOrder({
                 Sửa
               </Button>
             ) : null}
-            {!editOrderUser ? null : (
+            {editOrderUser ? null : (
               <Button
                 isLoading={isLoadingAddOrder}
                 disabled={isLoadingAddOrder}
