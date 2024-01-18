@@ -9,6 +9,7 @@ import {
   query,
   orderBy,
   getDoc,
+  collectionGroup,
 } from 'firebase/firestore';
 
 import { MenuCollectionRef } from '@/constants/firebaseCollections.constant';
@@ -160,6 +161,29 @@ export const useAddOrder = () => {
   return useMutation({
     mutationFn: addOrder,
   });
+};
+
+/**
+ * Delete order by ID
+ */
+
+const getAllOrders = async () => {
+  const orderedRef = collectionGroup(firebaseDB, 'ordered');
+  const orderSnapshot = await getDocs(orderedRef);
+  const allOrder = orderSnapshot.docs.map((order) => ({
+    id: order.id,
+    ...order.data(),
+  })) as IOrder[];
+  return allOrder;
+};
+
+export const useGetAllOrders = () => {
+  const { data: allOrders = [], ...queryOptions } = useQuery({
+    queryKey: ['get-all-orders'],
+    queryFn: getAllOrders,
+  });
+
+  return { allOrders, ...queryOptions };
 };
 
 /**
