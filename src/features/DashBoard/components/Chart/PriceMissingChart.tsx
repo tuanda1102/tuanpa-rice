@@ -18,9 +18,8 @@ export default function PriceMissingChart({
 }: IPriceMissingProps) {
   const totalPriceMissing = -totalPrice(allOrderMissing);
 
-  const precentMissing = useMemo(
+  const precentPaid = useMemo(
     () =>
-      100 -
       Math.round((totalPrice(allOrderMissing) / totalPrice(allOrders)) * 100),
     [allOrderMissing, allOrders],
   );
@@ -45,7 +44,7 @@ export default function PriceMissingChart({
           </h2>
           <ReactApexChart
             options={options}
-            series={[precentMissing]}
+            series={[precentPaid]}
             type='radialBar'
             height={350}
           />

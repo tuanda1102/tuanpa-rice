@@ -9,6 +9,7 @@ import {
   query,
   orderBy,
   getDoc,
+  collectionGroup,
 } from 'firebase/firestore';
 
 import { MenuCollectionRef } from '@/constants/firebaseCollections.constant';
@@ -162,45 +163,14 @@ export const useAddOrder = () => {
   });
 };
 
-/**
- * Get all order missing
- */
 const getAllOrders = async () => {
-  const orderedRef = collection(firebaseDB, 'menu');
-  const ordersSnapshot = await getDocs(orderedRef);
-
-  const filteredOrders = await Promise.all(
-    ordersSnapshot.docs.map(async (menuDoc) => {
-      const menuData = menuDoc.data() as IMenu;
-
-      if (menuData.isBlocked) {
-        const orderedDocsRef = collection(menuDoc.ref, 'ordered');
-        const orderedDocsSnapshot = await getDocs(orderedDocsRef);
-
-        const orderedDataArray = orderedDocsSnapshot.docs.map((orderedDoc) => {
-          const orderData = orderedDoc.data();
-          return {
-            ...orderData,
-            id: orderedDoc.id,
-          };
-        }) as IOrder[];
-
-        const allOrdersStatusTrue = orderedDataArray.every(
-          (order) => order.status === true,
-        );
-
-        return allOrdersStatusTrue ? [] : orderedDataArray;
-      }
-
-      return [];
-    }),
-  );
-
-  const nonEmptyOrders = filteredOrders.filter(
-    (ordersArray) => ordersArray.length > 0,
-  );
-
-  return nonEmptyOrders.flat();
+  const orderedRef = collectionGroup(firebaseDB, 'ordered');
+  const querySnapshot = await getDocs(orderedRef);
+  const allOrder = querySnapshot.docs.map((dosc) => ({
+    id: dosc.id,
+    ...dosc.data(),
+  })) as IOrder[];
+  return allOrder;
 };
 
 export const useGetAllOrders = () => {
@@ -211,11 +181,6 @@ export const useGetAllOrders = () => {
 
   return { allOrders, ...queryOptions };
 };
-
-/**
- * Get Menu detail by ID
- */
-
 /**
  * Get Menu detail by ID
  */
