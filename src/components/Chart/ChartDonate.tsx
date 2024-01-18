@@ -40,7 +40,8 @@ function ChartDonate({ labels, prices }: IDataChart) {
       options={options}
       series={series}
       type='bar'
-      className='w-full h-[50vh]'
+      height={500}
+      className='w-full'
     />
   );
 }
