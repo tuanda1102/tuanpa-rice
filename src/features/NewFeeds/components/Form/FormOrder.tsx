@@ -27,6 +27,8 @@ interface IFormOrderProps extends CardProps {}
 
 interface IFormAddOrder extends IFormOrderProps {
   editOrderUser?: IOrder;
+  price?: number;
+  isSamePrice?: boolean | undefined;
   onClose?: () => void;
 }
 
@@ -34,10 +36,18 @@ const defaultValues = {
   foodName: '',
   price: '',
   status: false,
+  samePrice: false,
+};
+const defaultValuesSamePrice = {
+  foodName: '',
+  status: false,
+  samePrice: true,
 };
 
 function FormOrder({
   editOrderUser,
+  price,
+  isSamePrice,
   onClose,
   ...passCardProps
 }: IFormAddOrder) {
@@ -47,15 +57,22 @@ function FormOrder({
 
   const { mutate, isLoading: isLoadingAddOrder } = useAddOrder();
   const { data } = useMenu(menuId);
-
+  const valueReset = isSamePrice ? defaultValuesSamePrice : defaultValues;
   const { isLoading: isLoadingUpdateOrder, mutate: updateOrder } =
     useUpdateOrder();
+
   const methods = useFormWithYupSchema(orderSchema, {
-    defaultValues,
+    defaultValues: {
+      foodName: '',
+      price: isSamePrice ? price : '',
+      status: false,
+      samePrice: false,
+    },
     values: {
       foodName: editOrderUser?.foodName,
-      price: editOrderUser?.price,
+      price: isSamePrice ? price : editOrderUser?.price,
       status: editOrderUser?.status,
+      samePrice: isSamePrice,
     },
   });
 
@@ -100,7 +117,7 @@ function FormOrder({
                   text: 'Chỉnh sửa thành công!',
                 },
               });
-              reset(defaultValues);
+              reset(valueReset);
               onClose();
             }
           },
@@ -171,6 +188,7 @@ function FormOrder({
             />
 
             <CNumberInput
+              disabled={isSamePrice}
               classNameWrapper='mb-0'
               label='Giá tiền'
               name='price'
