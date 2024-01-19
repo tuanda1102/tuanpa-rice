@@ -2,8 +2,8 @@ import { useId, useMemo } from 'react';
 import ReactApexChart from 'react-apexcharts';
 import { Spinner } from '@nextui-org/react';
 import { type IOrder } from '@/types/order';
-import { formatterPrice } from '@/utils/functions..util';
-import { totalPrice } from '@/features/DashBoard/utils/functions.util';
+import { formatterPrice } from '@/utils/prices.util';
+import { totalPrice } from '@/features/DashBoard/utils/dashBoard.util';
 import { priceMissingChartOptions } from './ChartOptions/moneyMissingOptions';
 
 interface IPriceMissingProps {
