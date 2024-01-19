@@ -11,7 +11,6 @@ function NewFeeds() {
   const { menuList } = useMenus();
 
   const currentMenu = menuList?.find((item) => item.id === menuId);
-
   return (
     <div className='flex gap-4 h-full'>
       <NewFeedsMenu />
@@ -24,7 +23,10 @@ function NewFeeds() {
         />
         {menuId && !currentMenu?.isBlocked ? (
           <div className='flex-grow'>
-            <FormOrder />
+            <FormOrder
+              price={currentMenu?.price}
+              isSamePrice={currentMenu?.isSamePrice}
+            />
           </div>
         ) : (
           ''
