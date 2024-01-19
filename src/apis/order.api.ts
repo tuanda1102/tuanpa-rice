@@ -10,6 +10,8 @@ import {
   orderBy,
   getDoc,
   collectionGroup,
+  where,
+  writeBatch,
 } from 'firebase/firestore';
 
 import { MenuCollectionRef } from '@/constants/firebaseCollections.constant';
@@ -58,7 +60,7 @@ export const useUpdateOrder = () => {
   });
 };
 /**
- * Lấy menu
+ * Lấy menus
  */
 const getMenus = async () => {
   const menu = await getDocs(
@@ -79,6 +81,10 @@ export const useMenus = () => {
 
   return { menuList, ...queryOptions };
 };
+
+/**
+ * Lấy menu
+ */
 
 const getMenu = async (menuId: string) => {
   const menuRef = doc(firebaseDB, 'menu', menuId);
@@ -164,12 +170,13 @@ export const useAddOrder = () => {
 };
 
 /**
- * Delete order by ID
+ * Get all order
  */
 
 const getAllOrders = async () => {
   const orderedRef = collectionGroup(firebaseDB, 'ordered');
   const orderSnapshot = await getDocs(orderedRef);
+
   const allOrder = orderSnapshot.docs.map((order) => ({
     id: order.id,
     ...order.data(),
@@ -181,6 +188,42 @@ export const useGetAllOrders = () => {
   const { data: allOrders = [], ...queryOptions } = useQuery({
     queryKey: ['get-all-orders'],
     queryFn: getAllOrders,
+  });
+
+  return { allOrders, ...queryOptions };
+};
+
+/**
+ * update all order
+ */
+
+const updateAllOrders = async (userEmail: string) => {
+  const orderedRef = collectionGroup(firebaseDB, 'ordered');
+  const orderSnapshot = await getDocs(
+    query(
+      orderedRef,
+      where('userEmail', '==', userEmail),
+      where('status', '==', false),
+    ),
+  );
+
+  const batch = writeBatch(firebaseDB);
+
+  orderSnapshot.forEach((orderMissing) => {
+    const orderRef = orderMissing.ref;
+    batch.update(orderRef, { status: true });
+  });
+
+  try {
+    await batch.commit();
+  } catch (error) {
+    throw Error('Error server');
+  }
+};
+
+export const useUpdateAllOrders = () => {
+  const { data: allOrders = [], ...queryOptions } = useMutation({
+    mutationFn: updateAllOrders,
   });
 
   return { allOrders, ...queryOptions };

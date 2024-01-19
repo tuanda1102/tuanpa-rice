@@ -8,30 +8,38 @@ import {
   type TableProps,
   Spinner,
   Button,
+  useDisclosure,
 } from '@nextui-org/react';
 import { type IOrder } from '@/types/order';
-import { formatterPrice } from '@/utils/functions..util';
-import { calculateRankMissing } from '@/features/DashBoard/utils/functions.util';
+import { formatterPrice } from '@/utils/prices.util';
+import ConfirmPaidModal from '@/features/DashBoard/components/Modal/ConfirmPaidModal';
+import { calculateRankMissing } from '@/features/DashBoard/utils/dashBoard.util';
+import { useFetchUser } from '@/apis/user.api';
 
 interface ITableProps extends TableProps {
   allOrderMissing: IOrder[];
   isLoading: boolean;
 }
-
-export default function MoneyMissingTable({
+function MoneyMissingTable({
   allOrderMissing,
   isLoading,
   ...passProps
 }: ITableProps) {
+  const { onClose, onOpen, onOpenChange, isOpen } = useDisclosure();
+
+  const { authUser } = useFetchUser();
+
   const rankUserMissing = calculateRankMissing(allOrderMissing).sort(
     (a, b) => b.totalAmount - a.totalAmount,
   );
-  const handlePaidAll = () => {};
+
   return (
     <Table
       isHeaderSticky
       shadow='none'
+      selectionMode='single'
       aria-label='table-order'
+      defaultSelectedKeys={[authUser?.email as string]}
       classNames={{
         base: 'max-h-[400px] overflow-scroll',
         table: 'min-h-[450px]',
@@ -48,11 +56,11 @@ export default function MoneyMissingTable({
       <TableBody
         loadingContent={<Spinner label='Loading...' />}
         isLoading={isLoading}
-        items={allOrderMissing || []}
+        items={rankUserMissing || []}
       >
-        {allOrderMissing?.length
+        {rankUserMissing?.length
           ? rankUserMissing.map((ordered, index) => (
-              <TableRow key={ordered.id}>
+              <TableRow key={ordered.userEmail}>
                 <TableCell>{index + 1}</TableCell>
 
                 <TableCell>{ordered.userEmail}</TableCell>
@@ -61,9 +69,20 @@ export default function MoneyMissingTable({
                   {formatterPrice.format(ordered.totalAmount)}
                 </TableCell>
                 <TableCell>
-                  <Button color='success' onClick={handlePaidAll}>
-                    Thanh toán
-                  </Button>
+                  {authUser?.email === ordered.userEmail && (
+                    <>
+                      <Button color='success' variant='ghost' onPress={onOpen}>
+                        Thanh toán
+                      </Button>
+                      <ConfirmPaidModal
+                        userEmail={authUser.email}
+                        totalMissing={ordered.totalAmount}
+                        isOpen={isOpen}
+                        onOpenChange={onOpenChange}
+                        onClose={onClose}
+                      />
+                    </>
+                  )}
                 </TableCell>
               </TableRow>
             ))
@@ -72,3 +91,5 @@ export default function MoneyMissingTable({
     </Table>
   );
 }
+
+export default MoneyMissingTable;
