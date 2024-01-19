@@ -251,6 +251,7 @@ function ModalMenu({ dataMenu, onClose, ...passProps }: IModalMenuProps) {
                   label='Up ảnh Menu cho mọi người dễ chọn nhóaaa'
                   name='image'
                   id='image'
+                  disabled={!!dataMenu?.image}
                 />
 
                 <CInputValidation

@@ -16,8 +16,7 @@ export const menuSchema = Yup.object().shape({
     .min(0, 'Giá phải lớn hơn 0 nghe!')
     .when('isSamePrice', {
       is: (isSamePrice: boolean) => isSamePrice === true,
-      then: () =>
-        Yup.number().required('Price is required when isSamePrice is true'),
+      then: () => Yup.number().required('Price is required'),
       otherwise: () => Yup.number().nullable(),
     })
     .nullable(),
