@@ -30,7 +30,7 @@ function NewFeedsMenu() {
   const dateWatch = watch('date');
 
   useEffect(() => {
-    setDateValue(dateWatch);
+    setDateValue(dateWatch || new Date());
   }, [dateWatch]);
   return (
     <>
@@ -45,11 +45,11 @@ function NewFeedsMenu() {
         </div>
 
         <ScrollShadow className='w-full flex-grow p-2'>
-          {menuList && menuList?.length
+          {isSuccess && menuList && menuList?.length
             ? menuList.map((menu) => <MenuItem key={menu.id} menu={menu} />)
             : ''}
 
-          {isSuccess && !menuList?.length ? (
+          {!menuList?.length ? (
             <div className='flex flex-col items-center gap2 text-foreground-400'>
               <CgCoffee size={48} />
               <h5>Không có menu để hiển thị</h5>

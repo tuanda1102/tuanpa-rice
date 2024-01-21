@@ -9,6 +9,7 @@ import {
 } from '@nextui-org/react';
 import { Controller, FormProvider } from 'react-hook-form';
 import { IoMdAdd } from 'react-icons/io';
+import { useEffect, useState } from 'react';
 
 import { yupResolver } from '@hookform/resolvers/yup';
 import { type IUploadCloudinaryInfo } from '@/types/upload';
@@ -29,32 +30,42 @@ interface IModalMenuProps extends Omit<ModalProps, 'children'> {
 
 const defaultValues = {
   image: null,
-  title: null,
+  title: '',
   price: null,
   isSamePrice: false,
   priceSale: null,
   menuLink: null,
 };
 
+//  change file to FileList
+function FileToFileList(file: File | null) {
+  const fileList = new DataTransfer();
+  if (file !== null) {
+    fileList.items.add(file);
+    return fileList.files;
+  }
+  return null;
+}
+
 function ModalMenu({ dataMenu, onClose, ...passProps }: IModalMenuProps) {
   const { authUser } = useFetchUser();
 
   const toggleMenu = useUpdateMenu();
   const uploadImage = useUploadImage();
-
+  const [fileImage, setFileImage] = useState<File | null>(null);
+  const listImage = FileToFileList(fileImage);
   const addMenu = useAddMenu();
   const updateMenu = useUpdateMenu();
 
   const methods = useFormWithYupSchema(menuSchema, {
     defaultValues,
-    values: dataMenu,
+    values: { ...dataMenu, image: dataMenu?.image === null ? null : listImage },
     mode: 'onChange',
     resolver: yupResolver(menuSchema),
   });
   const { handleSubmit, reset, control, watch } = methods;
 
   const isSamePriceWatch = watch('isSamePrice');
-
   const handleUpdateMenu = (values: Partial<IMenu>) => {
     const data = {
       menuId: dataMenu ? dataMenu.id : '',
@@ -196,13 +207,35 @@ function ModalMenu({ dataMenu, onClose, ...passProps }: IModalMenuProps) {
     }
   });
 
+  useEffect(() => {
+    // change image url to file
+    const imageUrl = dataMenu?.image;
+    if (imageUrl !== null && imageUrl !== undefined) {
+      const urlToObject = async () => {
+        if (imageUrl === null && imageUrl === undefined) {
+          throw new Error('Image URL is null.');
+        }
+        try {
+          const response = await fetch(imageUrl);
+          const blob = await response.blob();
+          const urlObject = new URL(imageUrl);
+          const filename = urlObject?.pathname?.split('/').pop() || 'image.jpg';
+          const file = new File([blob], filename, { type: blob.type });
+          setFileImage(file);
+          return file;
+        } catch (error) {
+          return null;
+        }
+      };
+      urlToObject();
+    }
+  }, [dataMenu?.image]);
+
   return (
     <div>
       <Modal
         size='3xl'
-        onClose={() => {
-          reset(defaultValues);
-        }}
+        onClose={() => (dataMenu ? reset({}) : reset(defaultValues))}
         {...passProps}
       >
         <ModalContent>
@@ -241,7 +274,7 @@ function ModalMenu({ dataMenu, onClose, ...passProps }: IModalMenuProps) {
                   id='price'
                 />
 
-                {isSamePriceWatch === false && (
+                {isSamePriceWatch === true ? null : (
                   <CNumberInput
                     label='Giá sale nè'
                     name='priceSale'
@@ -266,8 +299,16 @@ function ModalMenu({ dataMenu, onClose, ...passProps }: IModalMenuProps) {
                     Close
                   </Button>
                   <Button
-                    disabled={uploadImage.isLoading || addMenu.isLoading}
-                    isLoading={uploadImage.isLoading || addMenu.isLoading}
+                    disabled={
+                      uploadImage.isLoading ||
+                      addMenu.isLoading ||
+                      updateMenu.isLoading
+                    }
+                    isLoading={
+                      uploadImage.isLoading ||
+                      addMenu.isLoading ||
+                      updateMenu.isLoading
+                    }
                     type='submit'
                     color='primary'
                     startContent={<IoMdAdd />}

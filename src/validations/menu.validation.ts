@@ -13,14 +13,15 @@ export const menuSchema = Yup.object().shape({
     )
     .nullable(),
   price: Yup.number()
+    .min(0, 'Giá phải lớn hơn 0 nghe!')
     .when('isSamePrice', {
       is: (isSamePrice: boolean) => isSamePrice === true,
-      then: () =>
-        Yup.number().required('Price is required when isSamePrice is true'),
+      then: () => Yup.number().required('Price is required'),
       otherwise: () => Yup.number().nullable(),
     })
     .nullable(),
   priceSale: Yup.number()
+    .min(0, 'Giá phải lớn hơn 0 nghe!')
     .when('price', {
       is: (price: number) => price !== null,
       then: (priceSchema) =>
