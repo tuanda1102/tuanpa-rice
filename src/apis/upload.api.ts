@@ -26,3 +26,28 @@ export const useUploadImage = () => {
     mutationFn: uploadApi,
   });
 };
+
+const uploadApiEdit = async (data: string) => {
+  const formData = new FormData();
+  formData.append('file', data);
+  formData.append('upload_preset', APP_ENV.cloudinary.apiPreset);
+  formData.append('cloud_name', APP_ENV.cloudinary.name);
+
+  const response = await fetch(
+    `https://api.cloudinary.com/v1_1/${APP_ENV.cloudinary.name}/image/upload`,
+    {
+      method: 'POST',
+      body: formData,
+    },
+  );
+
+  const res = response.json();
+
+  return res as any;
+};
+
+export const useUploadImageEdit = () => {
+  return useMutation({
+    mutationFn: uploadApiEdit,
+  });
+};

@@ -9,23 +9,23 @@ import {
 } from '@nextui-org/react';
 import { Controller, FormProvider } from 'react-hook-form';
 import { IoMdAdd } from 'react-icons/io';
-import { useEffect, useState } from 'react';
 
-import { yupResolver } from '@hookform/resolvers/yup';
 import { type IUploadCloudinaryInfo } from '@/types/upload';
 import CInputUploadFile from '@/components/Input/CInputUploadFile';
 import CInputValidation from '@/components/Input/CInputValidation';
 import { menuSchema } from '@/validations/menu.validation';
-import { useUploadImage } from '@/apis/upload.api';
+import { useUploadImage, useUploadImageEdit } from '@/apis/upload.api';
 import appToast from '@/utils/toast.util';
 import { type IMenu } from '@/types/menu';
 import { useAddMenu, useUpdateMenu } from '@/apis/order.api';
 import CNumberInput from '@/components/Input/CNumberInput';
 import { useFetchUser } from '@/apis/user.api';
 import { useFormWithYupSchema } from '@/hooks/useYupValidationResolver';
+import { menuEditSchema } from '@/validations/menuEdit.validation';
 
 interface IModalMenuProps extends Omit<ModalProps, 'children'> {
   dataMenu?: IMenu;
+  isEdit?: boolean;
 }
 
 const defaultValues = {
@@ -37,31 +37,23 @@ const defaultValues = {
   menuLink: null,
 };
 
-//  change file to FileList
-function FileToFileList(file: File | null) {
-  const fileList = new DataTransfer();
-  if (file !== null) {
-    fileList.items.add(file);
-    return fileList.files;
-  }
-  return null;
-}
-
-function ModalMenu({ dataMenu, onClose, ...passProps }: IModalMenuProps) {
+function ModalMenu({
+  dataMenu,
+  onClose,
+  isEdit = false,
+  ...passProps
+}: IModalMenuProps) {
   const { authUser } = useFetchUser();
-
   const toggleMenu = useUpdateMenu();
+  const uploadImageEdit = useUploadImageEdit();
   const uploadImage = useUploadImage();
-  const [fileImage, setFileImage] = useState<File | null>(null);
-  const listImage = FileToFileList(fileImage);
   const addMenu = useAddMenu();
   const updateMenu = useUpdateMenu();
 
-  const methods = useFormWithYupSchema(menuSchema, {
+  const methods = useFormWithYupSchema(dataMenu ? menuEditSchema : menuSchema, {
     defaultValues,
-    values: { ...dataMenu, image: dataMenu?.image === null ? null : listImage },
+    values: dataMenu,
     mode: 'onChange',
-    resolver: yupResolver(menuSchema),
   });
   const { handleSubmit, reset, control, watch } = methods;
 
@@ -69,7 +61,7 @@ function ModalMenu({ dataMenu, onClose, ...passProps }: IModalMenuProps) {
   const handleUpdateMenu = (values: Partial<IMenu>) => {
     const data = {
       menuId: dataMenu ? dataMenu.id : '',
-      body: { isBlocked: !dataMenu?.isBlocked },
+      body: { isBlocked: true },
     };
     const dataUpdate = {
       menuId: dataMenu?.id ? dataMenu.id : '',
@@ -89,8 +81,8 @@ function ModalMenu({ dataMenu, onClose, ...passProps }: IModalMenuProps) {
     };
     updateMenu.mutate(dataUpdate, {
       onSuccess() {
-        if (!dataMenu?.isBlocked) {
-          if (!dataMenu?.isSamePrice) {
+        if (!dataMenu?.isBlocked && !dataMenu?.isSamePrice) {
+          if (isEdit) {
             toggleMenu.mutate(data, {
               onSuccess() {
                 appToast({
@@ -154,9 +146,8 @@ function ModalMenu({ dataMenu, onClose, ...passProps }: IModalMenuProps) {
   const submitHandler = handleSubmit(async (values) => {
     if (dataMenu) {
       if (values.image?.length) {
-        const uploadRes: IUploadCloudinaryInfo = await uploadImage.mutateAsync(
-          values.image as unknown as FileList,
-          {
+        const uploadRes: IUploadCloudinaryInfo =
+          await uploadImageEdit.mutateAsync(values.image as unknown as string, {
             onError(error) {
               appToast({
                 type: 'error',
@@ -170,8 +161,7 @@ function ModalMenu({ dataMenu, onClose, ...passProps }: IModalMenuProps) {
               console.log('UPLOAD-IMAGE-ERROR');
               throw error;
             },
-          },
-        );
+          });
 
         if (uploadRes) {
           handleUpdateMenu({ ...values, image: uploadRes.url });
@@ -206,30 +196,6 @@ function ModalMenu({ dataMenu, onClose, ...passProps }: IModalMenuProps) {
       handleAddMenu({ ...values, image: null });
     }
   });
-
-  useEffect(() => {
-    // change image url to file
-    const imageUrl = dataMenu?.image;
-    if (imageUrl !== null && imageUrl !== undefined) {
-      const urlToObject = async () => {
-        if (imageUrl === null && imageUrl === undefined) {
-          throw new Error('Image URL is null.');
-        }
-        try {
-          const response = await fetch(imageUrl);
-          const blob = await response.blob();
-          const urlObject = new URL(imageUrl);
-          const filename = urlObject?.pathname?.split('/').pop() || 'image.jpg';
-          const file = new File([blob], filename, { type: blob.type });
-          setFileImage(file);
-          return file;
-        } catch (error) {
-          return null;
-        }
-      };
-      urlToObject();
-    }
-  }, [dataMenu?.image]);
 
   return (
     <div>
@@ -274,7 +240,7 @@ function ModalMenu({ dataMenu, onClose, ...passProps }: IModalMenuProps) {
                   id='price'
                 />
 
-                {isSamePriceWatch === true ? null : (
+                {isSamePriceWatch ? null : (
                   <CNumberInput
                     label='Giá sale nè'
                     name='priceSale'
