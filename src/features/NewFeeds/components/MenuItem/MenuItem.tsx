@@ -9,7 +9,11 @@ function MenuItem({ menu }: { menu: IMenu }) {
     <div className='flex flex-col items-center gap-2 pb-4 mb-4 border-b-1 border-gray-400'>
       <MenuItemHeader menu={menu} />
 
-      {menu.image ? <Image className='rounded' src={menu.image} /> : ''}
+      {menu.image ? (
+        <Image className='z-0 drop-shadow-lg rounded' src={menu.image} />
+      ) : (
+        ''
+      )}
 
       <MenuItemContent menu={menu} />
     </div>

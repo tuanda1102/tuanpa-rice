@@ -63,9 +63,16 @@ export const useUpdateOrder = () => {
 /**
  * Lấy menus
  */
-const getMenus = async () => {
+const getMenus = async (startDate: Date, endDate: Date) => {
+  if (!startDate || !endDate) {
+    return [];
+  }
   const menu = await getDocs(
-    query(MenuCollectionRef, orderBy('createdAt', 'desc')),
+    query(
+      MenuCollectionRef,
+      where('createdAt', '>=', startDate),
+      where('createdAt', '<=', endDate),
+    ),
   );
   const menuList = menu.docs.map((elem) => ({
     ...elem.data(),
@@ -74,10 +81,10 @@ const getMenus = async () => {
   return menuList;
 };
 
-export const useMenus = () => {
+export const useMenus = (startDate: Date, endDate: Date) => {
   const { data: menuList, ...queryOptions } = useQuery({
-    queryKey: ['get-menus'],
-    queryFn: getMenus,
+    queryKey: ['get-menus', startDate, endDate],
+    queryFn: () => getMenus(startDate, endDate),
   });
 
   return { menuList, ...queryOptions };
