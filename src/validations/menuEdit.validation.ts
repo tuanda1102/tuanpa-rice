@@ -1,22 +1,13 @@
 import * as Yup from 'yup';
 
-export const menuSchema = Yup.object().shape({
+export const menuEditSchema = Yup.object().shape({
   title: Yup.string().required('Nhập tên menu này!'),
-  image: Yup.mixed<FileList>()
-    .test(
-      'fileSize',
-      'Up ảnh bé bé thui =))), cỡ 150kb trở lại đồ đó.',
-      (files) => {
-        if (!files?.length) return true; // Không validate trong trường hợp không upload file
-        return files[0].size <= 150000; // 150kb
-      },
-    )
-    .nullable(),
+  image: Yup.string(),
   price: Yup.number()
     .min(0, 'Giá phải lớn hơn 0 nghe!')
     .when('isSamePrice', {
       is: (isSamePrice: boolean) => isSamePrice === true,
-      then: () => Yup.number().required('Vui lòng nhập số tiền'),
+      then: () => Yup.number().required('Price is required'),
       otherwise: () => Yup.number().nullable(),
     })
     .nullable(),

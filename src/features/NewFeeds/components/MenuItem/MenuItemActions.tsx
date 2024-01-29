@@ -26,10 +26,8 @@ function MenuItemActions({ menu }: IMenuItemAction) {
 
   const handleToggleMenu = () => {
     const data = { menuId: id, body: { isBlocked: !isBlocked } };
-    if (!isBlocked) {
-      if (!isSamePrice) {
-        onOpen();
-      }
+    if (!isBlocked && !isSamePrice) {
+      onOpen();
     } else {
       toggleMenu.mutate(data, {
         onSuccess() {

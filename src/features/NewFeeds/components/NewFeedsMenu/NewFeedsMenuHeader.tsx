@@ -20,6 +20,7 @@ function NewFeedsMenuHeader() {
           isOpen={isOpen}
           onClose={onClose}
           onOpenChange={onOpenChange}
+          isEdit
         />
       </div>
     </div>
