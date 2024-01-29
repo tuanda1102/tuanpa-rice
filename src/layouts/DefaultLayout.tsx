@@ -10,9 +10,9 @@ interface IDefaultLayoutProps extends HTMLAttributes<HTMLDivElement> {}
 function DefaultLayout({ children }: IDefaultLayoutProps) {
   return (
     <div className='fixed inset-0 rounded-none border-0 outline-0'>
-      <div>
+      <div className='flex flex-row '>
         <Sidebar />
-        <div className='sm:ml-sidebar px-6'>
+        <div className='mx-10 w-full'>
           <Header />
           <Card className='mb-10 h-[calc(100vh_-_1.5rem_-_theme(spacing.header))] rounded-[36px] p-4'>
             {/* <CardHeader className='italic text-primary font-semibold'>
