@@ -8,9 +8,10 @@ interface DatePickerCustomProps extends Omit<ReactDatePickerProps, 'onChange'> {
   isLoading?: boolean;
 }
 
+const today = new Date();
+
 function CDatePicker({ name, isLoading, ...passProps }: DatePickerCustomProps) {
   const { trigger, control } = useFormContext();
-  const today = new Date();
 
   return (
     <Controller

@@ -24,7 +24,7 @@ function ChartDonate({ labels, prices }: IDataChart) {
       },
     },
     xaxis: {
-      categories: labels,
+      categories: labels || [],
     },
   };
 
@@ -40,7 +40,7 @@ function ChartDonate({ labels, prices }: IDataChart) {
       options={options}
       series={series}
       type='bar'
-      height={500}
+      height={400}
       className='w-full'
     />
   );
