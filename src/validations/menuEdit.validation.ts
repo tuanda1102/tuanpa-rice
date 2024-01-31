@@ -2,7 +2,7 @@ import * as Yup from 'yup';
 
 export const menuEditSchema = Yup.object().shape({
   title: Yup.string().required('Nhập tên menu này!'),
-  image: Yup.string(),
+  image: Yup.string().nullable(),
   price: Yup.number()
     .min(0, 'Giá phải lớn hơn 0 nghe!')
     .when('isSamePrice', {
