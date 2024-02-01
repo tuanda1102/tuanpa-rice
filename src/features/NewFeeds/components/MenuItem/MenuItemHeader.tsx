@@ -70,6 +70,7 @@ function MenuItemHeader({ menu }: IMenuItemHeaderProps) {
             onClose={updateDisclosure.onClose}
             onOpenChange={updateDisclosure.onOpenChange}
             isOpen={updateDisclosure.isOpen}
+            isEdit
           />
 
           <ModalDeleteMenu

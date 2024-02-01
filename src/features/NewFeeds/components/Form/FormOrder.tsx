@@ -152,7 +152,7 @@ function FormOrder({
                 text: 'Đặt đơn thành công!',
               },
             });
-            reset(defaultValues);
+            reset(valueReset);
           },
           onError() {
             appToast({

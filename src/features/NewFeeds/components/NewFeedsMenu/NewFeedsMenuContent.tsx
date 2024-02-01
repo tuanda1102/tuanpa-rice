@@ -33,11 +33,15 @@ function NewFeedsMenuContent() {
       setDateValue(dateParam || new Date());
     }
   }, [location]);
+
   return (
     <>
       <ScrollShadow className='w-full flex-grow p-2'>
         {menuList && menuList?.length
-          ? menuList.map((menu) => <MenuItem key={menu.id} menu={menu} />)
+          ? menuList
+              .slice()
+              .reverse()
+              .map((menu) => <MenuItem key={menu.id} menu={menu} />)
           : ''}
 
         {isSuccess && !menuList?.length ? (
