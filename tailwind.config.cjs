@@ -12,7 +12,7 @@ export default {
     extend: {
       spacing: {
         ...defaultTheme.spacing,
-        sidebar: '90px',
+        sidebar: '100px',
         header: '90px',
         banner: '380px',
         input: '56px',
