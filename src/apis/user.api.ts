@@ -33,6 +33,7 @@ export const useFetchUser = () => {
         removeLocalStorageByKey('google_access_token');
       }
     },
+    cacheTime: Infinity,
   });
 
   return { authUser, ...queryProps };

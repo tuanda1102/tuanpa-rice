@@ -12,10 +12,16 @@ import { IoAdd } from 'react-icons/io5';
 import { Controller, FormProvider } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
 
+import { useEffect } from 'react';
 import CInputValidation from '@/components/Input/CInputValidation';
 import CNumberInput from '@/components/Input/CNumberInput';
 import { orderSchema } from '@/features/NewFeeds/validations/order.validation';
-import { useAddOrder, useUpdateOrder, useMenu } from '@/apis/order.api';
+import {
+  useAddOrder,
+  useUpdateOrder,
+  useMenu,
+  useGetOrderedListById,
+} from '@/apis/order.api';
 import useSearchParamsCustom from '@/hooks/useSearchParamsCustom';
 import { type INewFeedsSearchParams } from '@/features/NewFeeds/types/newFeeds';
 import { useFetchUser } from '@/apis/user.api';
@@ -42,6 +48,7 @@ const defaultValuesSamePrice = {
   foodName: '',
   status: false,
   samePrice: true,
+  price: '',
 };
 
 function FormOrder({
@@ -60,7 +67,7 @@ function FormOrder({
   const valueReset = isSamePrice ? defaultValuesSamePrice : defaultValues;
   const { isLoading: isLoadingUpdateOrder, mutate: updateOrder } =
     useUpdateOrder();
-
+  const { orderedList } = useGetOrderedListById(menuId as string);
   const methods = useFormWithYupSchema(orderSchema, {
     defaultValues: {
       foodName: '',
@@ -80,6 +87,7 @@ function FormOrder({
     control,
     handleSubmit,
     reset,
+    clearErrors,
     formState: { isDirty },
   } = methods;
 
@@ -166,6 +174,10 @@ function FormOrder({
       );
     }
   });
+
+  useEffect(() => {
+    clearErrors();
+  }, [clearErrors, orderedList]);
 
   return (
     <Card

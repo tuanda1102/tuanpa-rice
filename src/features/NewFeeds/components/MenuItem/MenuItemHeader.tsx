@@ -11,6 +11,7 @@ import { type HTMLAttributes } from 'react';
 import { CiEdit } from 'react-icons/ci';
 import { GoKebabHorizontal } from 'react-icons/go';
 import { MdDeleteOutline } from 'react-icons/md';
+
 import { useFetchUser } from '@/apis/user.api';
 import ModalDeleteMenu from '@/features/NewFeeds/components/Modal/ModalDeleteMenu';
 import ModalMenu from '@/features/NewFeeds/components/Modal/ModalMenu';
@@ -24,7 +25,9 @@ function MenuItemHeader({ menu }: IMenuItemHeaderProps) {
   const deleteDisclosure = useDisclosure();
   const updateDisclosure = useDisclosure();
   const { authUser } = useFetchUser();
+
   const { createdByUser, id } = menu;
+
   return (
     <div className='flex justify-between items-center w-full'>
       <div className='flex items-center gap-3'>
@@ -42,9 +45,9 @@ function MenuItemHeader({ menu }: IMenuItemHeaderProps) {
         <Button isIconOnly variant='ghost' className='border-0'>
           <Dropdown placement='bottom-end'>
             <DropdownTrigger>
-              <Button>
+              <i>
                 <GoKebabHorizontal size={18} />
-              </Button>
+              </i>
             </DropdownTrigger>
 
             <DropdownMenu aria-label='menu Actions' variant='flat'>
@@ -65,6 +68,7 @@ function MenuItemHeader({ menu }: IMenuItemHeaderProps) {
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
+
           <ModalMenu
             dataMenu={menu}
             onClose={updateDisclosure.onClose}

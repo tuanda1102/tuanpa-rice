@@ -44,11 +44,11 @@ function ProtectedRouter({ isAuth, children }: IProtectedRouterProps) {
  * Define all routes of App
  */
 function AppRouter() {
-  const { authUser, isSuccess } = useFetchUser();
+  const { authUser, isFetched } = useFetchUser();
 
   return (
     <>
-      {isSuccess && (
+      {isFetched && (
         <BrowserRouter>
           <Routes>
             {/* Public Routes */}
@@ -57,7 +57,6 @@ function AppRouter() {
             </Route>
 
             {/* Private Routes */}
-
             <Route element={<ProtectedRouter isAuth={!!authUser?.email} />}>
               {renderRoutes(privateRoutes)}
             </Route>

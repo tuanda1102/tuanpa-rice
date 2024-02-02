@@ -4,11 +4,16 @@ export const menuSchema = Yup.object().shape({
   title: Yup.string().required('Nhập tên menu này!'),
   image: Yup.mixed<FileList>()
     .test(
-      'fileSize',
+      'image',
       'Up ảnh bé bé thui =))), cỡ 150kb trở lại đồ đó.',
-      (files) => {
-        if (!files?.length) return true; // Không validate trong trường hợp không upload file
-        return files[0].size <= 150000; // 150kb
+      // eslint-disable-next-line func-names
+      function (files) {
+        const { image } = this.parent;
+        if (image !== undefined && typeof image !== 'string') {
+          if (!files?.length) return true; // Không validate trong trường hợp không upload file
+          return files[0].size <= 150000; // 150kb
+        }
+        return true;
       },
     )
     .nullable(),

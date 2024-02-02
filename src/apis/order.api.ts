@@ -67,6 +67,7 @@ const getMenus = async (startDate: Date, endDate: Date) => {
   if (!startDate || !endDate) {
     return [];
   }
+
   const menu = await getDocs(
     query(
       MenuCollectionRef,
@@ -123,8 +124,21 @@ interface IUpdateMenu {
 
 const updateMenu = async (data: IUpdateMenu) => {
   const menuRef = doc(firebaseDB, 'menu', data.menuId);
-  const res = await updateDoc(menuRef, data.body);
-  return res;
+  const orderedRef = collection(firebaseDB, 'menu', data.menuId, 'ordered');
+  const dataOrder = await getDocs(orderedRef);
+  const batch = writeBatch(firebaseDB);
+  if (data.body && typeof data.body.price !== 'undefined') {
+    dataOrder.forEach((orderMissing) => {
+      const orderRef = orderMissing.ref;
+      batch.update(orderRef, { price: data.body.price });
+    });
+  } else {
+    // eslint-disable-next-line no-console
+    console.error('Giá trị price không hợp lệ');
+    return; // Dừng việc thực hiện cập nhật
+  }
+  await updateDoc(menuRef, data.body);
+  await batch.commit();
 };
 
 export const useUpdateMenu = () => {
@@ -256,6 +270,7 @@ export const useUpdateAllOrders = () => {
  */
 const getOrderedListById = async (menuId: string) => {
   const orderedRef = collection(firebaseDB, 'menu', menuId, 'ordered');
+
   const menuDetail = await getDocs(
     query(orderedRef, orderBy('createdAt', 'asc')),
   );

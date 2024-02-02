@@ -24,6 +24,7 @@ import { useGetOrderedListById } from '@/apis/order.api';
 import { type IOrder } from '@/types/order';
 import ModalEditOder from '@/components/Modal/ModalEditOder';
 import ModalDeleteOrder from '@/components/Modal/ModalDeleteOrder';
+import { formatterPrice } from '@/utils/prices.util';
 
 interface ITableOrder extends TableProps {
   price: number;
@@ -58,7 +59,7 @@ function TableOrder({
   };
 
   const OrderList = useMemo(() => {
-    const discountedPrice = (currentPrice: number | null) => {
+    const discountedPrice = (currentPrice: number): number => {
       if (isSamePrice) {
         return currentPrice;
       }
@@ -79,7 +80,11 @@ function TableOrder({
           <TableCell>{ordered.userEmail}</TableCell>
           <TableCell>{ordered.foodName}</TableCell>
           <TableCell className='text-right'>
-            {discountedPrice(ordered.price) || '-'}
+            {isSamePrice
+              ? formatterPrice.format(price)
+              : formatterPrice.format(
+                  discountedPrice(ordered.price !== null ? ordered.price : 0),
+                ) || '-'}
           </TableCell>
           <TableCell className='text-center'>
             <Chip

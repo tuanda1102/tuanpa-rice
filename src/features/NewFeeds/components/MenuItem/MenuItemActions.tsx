@@ -7,6 +7,7 @@ import { useUpdateMenu } from '@/apis/order.api';
 import appToast from '@/utils/toast.util';
 import ModalMenu from '@/features/NewFeeds/components/Modal/ModalMenu';
 import { useFetchUser } from '@/apis/user.api';
+import { usePriceMenu } from '../../stores/newFeeds.store';
 
 interface IMenuItemAction {
   menu: IMenu;
@@ -19,13 +20,19 @@ function MenuItemActions({ menu }: IMenuItemAction) {
   const { authUser } = useFetchUser();
   const toggleMenu = useUpdateMenu();
 
+  const priceMenu = usePriceMenu();
+
   const handleClickOrder = () => {
     searchParams.set('menuId', id);
     setSearchParams(searchParams);
   };
 
   const handleToggleMenu = () => {
-    const data = { menuId: id, body: { isBlocked: !isBlocked } };
+    const data = {
+      menuId: id,
+      body: { isBlocked: !isBlocked, price: priceMenu },
+    };
+
     if (!isBlocked && !isSamePrice) {
       onOpen();
     } else {
@@ -75,6 +82,7 @@ function MenuItemActions({ menu }: IMenuItemAction) {
               onOpenChange={onOpenChange}
               isOpen={isOpen}
               dataMenu={menu}
+              isEdit
             />
           </div>
         ) : (

@@ -10,6 +10,7 @@ import {
 import { Controller, FormProvider } from 'react-hook-form';
 import { IoMdAdd } from 'react-icons/io';
 
+import { useEffect } from 'react';
 import { type IUploadCloudinaryInfo } from '@/types/upload';
 import CInputUploadFile from '@/components/Input/CInputUploadFile';
 import CInputValidation from '@/components/Input/CInputValidation';
@@ -21,10 +22,11 @@ import { useAddMenu, useUpdateMenu } from '@/apis/order.api';
 import CNumberInput from '@/components/Input/CNumberInput';
 import { useFetchUser } from '@/apis/user.api';
 import { useFormWithYupSchema } from '@/hooks/useYupValidationResolver';
-import { menuEditSchema } from '@/validations/menuEdit.validation';
+import { useNewFeedStoreActions } from '../../stores/newFeeds.store';
 
 interface IModalMenuProps extends Omit<ModalProps, 'children'> {
   dataMenu?: IMenu;
+  setPriceMenu?: React.Dispatch<React.SetStateAction<number>>;
   isEdit?: boolean;
 }
 
@@ -50,7 +52,9 @@ function ModalMenu({
   const addMenu = useAddMenu();
   const updateMenu = useUpdateMenu();
 
-  const methods = useFormWithYupSchema(dataMenu ? menuEditSchema : menuSchema, {
+  const { setPriceMenu } = useNewFeedStoreActions();
+
+  const methods = useFormWithYupSchema(menuSchema, {
     defaultValues,
     values: dataMenu,
     mode: 'onChange',
@@ -58,16 +62,17 @@ function ModalMenu({
   const { handleSubmit, reset, control, watch } = methods;
 
   const isSamePriceWatch = watch('isSamePrice');
+  const price = watch('price');
   const handleUpdateMenu = (values: Partial<IMenu>) => {
     const data = {
       menuId: dataMenu ? dataMenu.id : '',
-      body: { isBlocked: true },
+      body: { isBlocked: true, price },
     };
     const dataUpdate = {
       menuId: dataMenu?.id ? dataMenu.id : '',
       body: {
         title: values.title,
-        image: values.image,
+        image: dataMenu?.image,
         price: values.price || null,
         priceSale: isSamePriceWatch ? null : values.priceSale,
         menuLink: values.menuLink || null,
@@ -197,6 +202,12 @@ function ModalMenu({
     }
   });
 
+  useEffect(() => {
+    if (price !== undefined) {
+      setPriceMenu(price);
+    }
+  }, [price, setPriceMenu]);
+
   return (
     <div>
       <Modal
@@ -252,6 +263,7 @@ function ModalMenu({
                   label='Up ảnh Menu cho mọi người dễ chọn nhóaaa'
                   name='image'
                   id='image'
+                  disabled={!!dataMenu}
                 />
 
                 <CInputValidation
