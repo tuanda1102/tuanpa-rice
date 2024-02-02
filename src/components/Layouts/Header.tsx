@@ -43,7 +43,15 @@ function Header() {
             />
           </DropdownTrigger>
 
-          <DropdownMenu aria-label='Profile Actions' variant='flat'>
+          <DropdownMenu
+            disabledKeys={['profile']}
+            aria-label='Profile Actions'
+            variant='flat'
+          >
+            <DropdownItem key='profile' className='h-14 gap-2 opacity-100'>
+              <p className='font-semibold'>{authUser?.name}</p>
+              <p className='font-semibold'>{authUser?.email}</p>
+            </DropdownItem>
             <DropdownItem
               startContent={<IoIosLogOut size={20} />}
               onClick={() => {
