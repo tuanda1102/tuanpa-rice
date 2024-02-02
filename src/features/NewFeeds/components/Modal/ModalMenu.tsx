@@ -1,16 +1,15 @@
 import {
   Button,
-  Checkbox,
   Modal,
   ModalBody,
   ModalContent,
   ModalHeader,
   type ModalProps,
 } from '@nextui-org/react';
-import { Controller, FormProvider } from 'react-hook-form';
+import { FormProvider } from 'react-hook-form';
 import { IoMdAdd } from 'react-icons/io';
+import { memo, useEffect } from 'react';
 
-import { useEffect } from 'react';
 import { type IUploadCloudinaryInfo } from '@/types/upload';
 import CInputUploadFile from '@/components/Input/CInputUploadFile';
 import CInputValidation from '@/components/Input/CInputValidation';
@@ -23,10 +22,10 @@ import CNumberInput from '@/components/Input/CNumberInput';
 import { useFetchUser } from '@/apis/user.api';
 import { useFormWithYupSchema } from '@/hooks/useYupValidationResolver';
 import { useNewFeedStoreActions } from '../../stores/newFeeds.store';
+import CCheckbox from '@/components/Checkbox/CCheckbox';
 
 interface IModalMenuProps extends Omit<ModalProps, 'children'> {
   dataMenu?: IMenu;
-  setPriceMenu?: React.Dispatch<React.SetStateAction<number>>;
   isEdit?: boolean;
 }
 
@@ -56,13 +55,18 @@ function ModalMenu({
 
   const methods = useFormWithYupSchema(menuSchema, {
     defaultValues,
-    values: dataMenu,
+    values: {
+      ...dataMenu,
+      isSamePrice: dataMenu?.isSamePrice || false,
+      priceSale: dataMenu?.priceSale || false,
+    },
     mode: 'onChange',
   });
-  const { handleSubmit, reset, control, watch } = methods;
+  const { handleSubmit, reset, watch } = methods;
 
   const isSamePriceWatch = watch('isSamePrice');
   const price = watch('price');
+
   const handleUpdateMenu = (values: Partial<IMenu>) => {
     const data = {
       menuId: dataMenu ? dataMenu.id : '',
@@ -74,16 +78,17 @@ function ModalMenu({
         title: values.title,
         image: dataMenu?.image,
         price: values.price || null,
-        priceSale: isSamePriceWatch ? null : values.priceSale,
+        priceSale: values.priceSale || null,
         menuLink: values.menuLink || null,
         isSamePrice: values.isSamePrice,
-        isBlocked: false,
+        isBlocked: true,
         isDeleted: false,
         avatarThumbnail: (authUser?.picture as string) || null,
         createdByUser: authUser?.email as string,
-        createdAt: new Date(),
+        createdAt: dataMenu?.createdAt,
       },
     };
+
     updateMenu.mutate(dataUpdate, {
       onSuccess() {
         if (!dataMenu?.isBlocked && !dataMenu?.isSamePrice) {
@@ -120,12 +125,13 @@ function ModalMenu({
       },
     });
   };
+
   const handleAddMenu = (values: Partial<IMenu>) => {
     const data = {
       title: values.title,
       image: values.image,
       price: values.price || null,
-      priceSale: isSamePriceWatch ? null : values.priceSale,
+      priceSale: values.priceSale || null,
       menuLink: values.menuLink || null,
       isBlocked: false,
       isDeleted: false,
@@ -229,21 +235,7 @@ function ModalMenu({
                   id='title'
                 />
 
-                <Controller
-                  control={control}
-                  name='isSamePrice'
-                  render={({ field: { onChange, value } }) => (
-                    <Checkbox
-                      defaultSelected={false}
-                      onChange={onChange}
-                      value={value}
-                      isSelected={value}
-                      className='mb-1'
-                    >
-                      Đồng giá
-                    </Checkbox>
-                  )}
-                />
+                <CCheckbox name='isSamePrice'>Đồng giá</CCheckbox>
 
                 <CNumberInput
                   label='Giá món, nhập sau cũng được'
@@ -303,4 +295,4 @@ function ModalMenu({
   );
 }
 
-export default ModalMenu;
+export default memo(ModalMenu);

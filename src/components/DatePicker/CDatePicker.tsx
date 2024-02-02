@@ -6,11 +6,17 @@ import DatePicker, { type ReactDatePickerProps } from 'react-datepicker';
 interface DatePickerCustomProps extends Omit<ReactDatePickerProps, 'onChange'> {
   name: string;
   isLoading?: boolean;
+  onDateChange?: (value: Date | null) => void;
 }
 
 const today = new Date();
 
-function CDatePicker({ name, isLoading, ...passProps }: DatePickerCustomProps) {
+function CDatePicker({
+  name,
+  isLoading,
+  onDateChange,
+  ...passProps
+}: DatePickerCustomProps) {
   const { trigger, control } = useFormContext();
 
   return (
@@ -32,6 +38,9 @@ function CDatePicker({ name, isLoading, ...passProps }: DatePickerCustomProps) {
             onChange={(e) => {
               field.onChange(e);
               trigger(name);
+              if (typeof onDateChange === 'function') {
+                onDateChange(e);
+              }
             }}
             selected={field.value || today}
             className='border-none bg-transparent focus:outline-none pl-2 rounded-lg w-[110px]'

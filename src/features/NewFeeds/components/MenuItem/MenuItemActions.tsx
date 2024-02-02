@@ -61,7 +61,8 @@ function MenuItemActions({ menu }: IMenuItemAction) {
   return (
     <div className='flex justify-between items-center'>
       <div>
-        {authUser?.email === createdByUser ? (
+        {authUser?.email === createdByUser ||
+        authUser?.email === 'tuanpa@liftsoft.vn' ? (
           <div className='flex items-center gap-x-1'>
             <Button
               isLoading={toggleMenu.isLoading}
